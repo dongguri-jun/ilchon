@@ -1,0 +1,97 @@
+import { registerStrings } from '../../i18n'
+
+registerStrings('settings', {
+  ko: {
+    title: '설정',
+
+    secGeneral: '일반',
+    language: '언어',
+    demoMode: '시연 모드',
+    demoModeHelp: '일촌 한 명당 매칭 응답을 24시간에 한 번이 아니라 20초에 한 번 해요.',
+
+    secRelays: '릴레이 연결',
+    relayOn: '연결됨',
+    relayOff: '끊김',
+    relaysEmpty: '릴레이 정보가 아직 없어요.',
+
+    secKey: '내 키',
+    npub: '내 공개키 (npub)',
+    copy: '복사',
+    copied: '복사했어요',
+    copyFailed: '복사하지 못했어요',
+    backup: '키 백업',
+    backupHelp: '비밀키를 클립보드에 복사해요. 화면에는 보여주지 않아요.',
+    backupTitle: '비밀키를 복사할까요?',
+    backupBody:
+      '이 키를 가진 사람은 누구나 나인 척할 수 있어요. 복사한 뒤 바로 안전한 곳에 붙여 넣고, 메신저나 메모 앱에 남기지 마세요.',
+    backupConfirm: '복사하기',
+    backupDone: '비밀키를 복사했어요. 안전한 곳에 보관하세요.',
+
+    secDanger: '초기화',
+    reset: '이 기기 초기화',
+    resetHelp: '이 기기의 키, 일촌, 대화, 내 글을 모두 지워요.',
+    resetTitle: '이 기기를 초기화할까요?',
+    resetBody: '키와 일촌, 대화가 모두 사라져요. 키를 백업하지 않았다면 되돌릴 수 없고, 일촌과는 다시 만나서 연결해야 해요.',
+    resetConfirm: '모두 지우기',
+    resetFailed: '초기화하지 못했어요',
+
+    secAbout: '알아두세요',
+    seeTitle: '누가 무엇을 보나요',
+    see1: '릴레이는 암호문만 봐요. 누가 무엇을 얼마에 거래하려는지 알 수 없어요.',
+    see2: '나와 같은 방향이거나 글을 올리지 않은 일촌은 아무것도 못 봐요. 내가 글을 올렸는지도 몰라요.',
+    see3: '방향이 반대이고 통화가 같은 일촌만 금액과 수수료를 봐요.',
+    limitsTitle: '한계',
+    limit1: '에스크로가 없어요. 상대를 믿고 거래해야 해요.',
+    limit2: '계좌 이체는 은행이 볼 수 있어요.',
+    limit3: '작정한 일촌은 시간을 들여 내 거래 방향을 떠볼 수 있어요.',
+    limit4: '데이터는 이 기기에만 있어요. 브라우저 데이터를 지우면 사라져요.',
+    limit5: '알파 단계 소프트웨어 위에 만들었어요.',
+  },
+  en: {
+    title: 'Settings',
+
+    secGeneral: 'General',
+    language: 'Language',
+    demoMode: 'Demo mode',
+    demoModeHelp: 'Answers one match round per contact every 20 s instead of once per 24 h.',
+
+    secRelays: 'Relay connections',
+    relayOn: 'Connected',
+    relayOff: 'Offline',
+    relaysEmpty: 'No relay information yet.',
+
+    secKey: 'My key',
+    npub: 'My public key (npub)',
+    copy: 'Copy',
+    copied: 'Copied',
+    copyFailed: "Couldn't copy",
+    backup: 'Back up key',
+    backupHelp: 'Copies your secret key to the clipboard. It is never shown on screen.',
+    backupTitle: 'Copy your secret key?',
+    backupBody:
+      'Anyone who has this key can act as you. Paste it somewhere safe right away, and do not leave it in a chat or notes app.',
+    backupConfirm: 'Copy key',
+    backupDone: 'Secret key copied. Store it somewhere safe.',
+
+    secDanger: 'Reset',
+    reset: 'Reset this device',
+    resetHelp: 'Erases the key, contacts, chats and your offer on this device.',
+    resetTitle: 'Reset this device?',
+    resetBody:
+      'Your key, contacts and chats will be gone. Without a key backup this cannot be undone, and you will have to meet your contacts again to reconnect.',
+    resetConfirm: 'Erase everything',
+    resetFailed: "Couldn't reset",
+
+    secAbout: 'Good to know',
+    seeTitle: 'Who can see what',
+    see1: 'Relays see only ciphertext. They cannot tell who wants to trade what, or for how much.',
+    see2: 'Contacts on the same side as you, or with no offer, see nothing. They cannot even tell that you posted.',
+    see3: 'Only contacts on the opposite side in the same currency see your amount and fee.',
+    limitsTitle: 'Limits',
+    limit1: 'There is no escrow. You are trusting the other person.',
+    limit2: 'Bank transfers are visible to the bank.',
+    limit3: 'A determined contact can probe which side you are on over time.',
+    limit4: 'Data lives only on this device. Clearing the browser erases it.',
+    limit5: 'Built on alpha software.',
+  },
+})

@@ -1,0 +1,50 @@
+.ui-iconbtn {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  color: var(--c-text);
+  transition: background-color var(--dur-fast) ease, opacity var(--dur-fast) ease;
+}
+.ui-iconbtn--sm {
+  width: var(--h-sm);
+  height: var(--h-sm);
+}
+.ui-iconbtn--sm::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+.ui-iconbtn--md {
+  width: var(--h-md);
+  height: var(--h-md);
+}
+.ui-iconbtn--lg {
+  width: var(--h-lg);
+  height: var(--h-lg);
+}
+.ui-iconbtn--ghost:active:not(:disabled) {
+  background: var(--c-pressed-overlay);
+}
+.ui-iconbtn--filled {
+  background: var(--c-surface-2);
+}
+.ui-iconbtn--filled:active:not(:disabled) {
+  opacity: 0.6;
+}
+.ui-iconbtn--primary {
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+}
+.ui-iconbtn--primary:active:not(:disabled) {
+  background: var(--c-primary-pressed);
+}
+.ui-iconbtn:disabled {
+  color: var(--c-disabled-text);
+}
+.ui-iconbtn--filled:disabled,
+.ui-iconbtn--primary:disabled {
+  background: var(--c-disabled-bg);
+}

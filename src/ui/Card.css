@@ -1,0 +1,41 @@
+/* Coconut cards: radius 20 (radius_300), padding 16/20 (CoconutPadding.container) */
+.ui-card {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  color: var(--c-text);
+  text-align: left;
+}
+.ui-card--outline {
+  background: transparent;
+  border-color: var(--c-border);
+}
+.ui-card--primary {
+  background: var(--c-primary-soft);
+  border-color: var(--c-accent);
+}
+.ui-card--p-none {
+  padding: 0;
+}
+.ui-card--p-sm {
+  padding: var(--sp-12);
+}
+.ui-card--p-md {
+  padding: var(--sp-20) var(--sp-16);
+}
+.ui-card--p-lg {
+  padding: var(--sp-24);
+}
+.ui-card.is-pressable {
+  cursor: pointer;
+  transition: opacity var(--dur-fast) ease;
+}
+.ui-card.is-pressable:active:not(:disabled) {
+  opacity: 0.6;
+}
+.ui-card:disabled {
+  opacity: 0.5;
+}

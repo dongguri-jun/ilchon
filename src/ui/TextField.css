@@ -1,0 +1,79 @@
+.ui-field {
+  display: block;
+  min-width: 0;
+}
+.ui-field__label {
+  display: block;
+  margin-bottom: var(--sp-6);
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+/* Coconut text field: outlined, radius 12, border gray600 -> text color on focus */
+.ui-field__box {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  min-height: var(--h-input);
+  padding: 0 var(--sp-16);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-md);
+  background: transparent;
+  transition: border-color var(--dur-fast) ease;
+}
+.ui-field__box.is-multiline {
+  align-items: flex-start;
+  padding-top: var(--sp-12);
+  padding-bottom: var(--sp-12);
+}
+.ui-field__box:focus-within {
+  border-color: var(--c-text);
+}
+.ui-field.is-error .ui-field__box {
+  border-color: var(--c-danger);
+}
+.ui-field.is-disabled .ui-field__box {
+  background: var(--c-disabled-bg);
+  border-color: transparent;
+}
+/* 16px so iOS Safari does not zoom the page on focus */
+.ui-field__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--c-text);
+  caret-color: var(--c-text);
+  font-size: var(--fs-16);
+  line-height: var(--lh-body);
+  resize: none;
+}
+.ui-field__input:not(textarea) {
+  height: calc(var(--h-input) - 2px);
+}
+.ui-field__input::placeholder {
+  color: var(--c-text-faint);
+  opacity: 1;
+}
+.ui-field__input:disabled {
+  color: var(--c-disabled-text);
+}
+.ui-field__affix {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  color: var(--c-text-dim);
+  font-size: var(--fs-14);
+}
+.ui-field__msg {
+  margin-top: var(--sp-4);
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+.ui-field.is-error .ui-field__msg {
+  color: var(--c-danger-text);
+}

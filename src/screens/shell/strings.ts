@@ -1,0 +1,38 @@
+import { registerStrings } from '../../i18n'
+
+registerStrings('shell', {
+  ko: {
+    banner: '해커톤 시연판 · 실제 거래는 본인 책임',
+    tabBoard: '게시판',
+    tabContacts: '일촌',
+    tabSettings: '설정',
+    bootTitle: 'ilchon',
+    bootLine: 'Marmot 릴레이에 연결하고 있어요',
+    bootErrorTitle: '시작하지 못했어요',
+    bootErrorBody: '릴레이 연결이나 저장소에 문제가 있어요. 네트워크를 확인하고 다시 시도해 주세요.',
+    bootErrorTab: '이미 다른 탭에서 열려 있어요. 그 탭을 닫고 다시 시도해 주세요.',
+    retry: '다시 시도',
+    introTitle: '일촌끼리만 거래해요',
+    intro1: '직접 만나 서로의 QR을 찍은 사람하고만 거래해요.',
+    intro2: '내가 올린 글은 반대로 거래하려는 일촌에게만 보여요.',
+    intro3: '서버도 계정도 없어요.',
+    introDismiss: '안내 닫기',
+  },
+  en: {
+    banner: 'Hackathon demo · trade at your own risk',
+    tabBoard: 'Board',
+    tabContacts: 'Contacts',
+    tabSettings: 'Settings',
+    bootTitle: 'ilchon',
+    bootLine: 'Connecting to Marmot relays',
+    bootErrorTitle: "Couldn't start",
+    bootErrorBody: 'Something went wrong with the relay connection or local storage. Check your network and try again.',
+    bootErrorTab: 'ilchon is already open in another tab. Close that tab and try again.',
+    retry: 'Try again',
+    introTitle: 'Trade only with people you know',
+    intro1: "You trade only with people you met and connected to by scanning each other's QR.",
+    intro2: 'What you post is shown only to contacts who want the opposite.',
+    intro3: 'There is no server and no account.',
+    introDismiss: 'Dismiss',
+  },
+})

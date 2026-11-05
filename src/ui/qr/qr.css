@@ -1,0 +1,48 @@
+.qr-tile {
+  display: inline-block;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: var(--radius-md, 16px);
+  overflow: hidden;
+  line-height: 0;
+  flex: none;
+}
+
+.qr-tile svg {
+  display: block;
+}
+
+.qr-tile--empty {
+  background: var(--c-surface, #1c1c1e);
+}
+
+.qr-scanner {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--c-surface, #1c1c1e);
+  border-radius: var(--radius-md, 16px);
+  overflow: hidden;
+}
+
+.qr-scanner__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.qr-scanner--live .qr-scanner__video {
+  opacity: 1;
+}
+
+.qr-scanner__frame {
+  position: absolute;
+  inset: 14%;
+  border: 2px solid var(--c-primary, #f7931a);
+  border-radius: var(--radius-md, 16px);
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}

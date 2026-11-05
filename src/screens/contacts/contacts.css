@@ -1,0 +1,59 @@
+.contacts {
+  min-height: 100%;
+}
+
+.contacts__count {
+  padding-right: var(--sp-12);
+  font-size: var(--fs-14);
+}
+
+.contacts__body {
+  padding-top: var(--sp-8);
+}
+
+.contacts__intro {
+  margin: 0 0 var(--sp-12);
+}
+
+.contacts__list {
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  overflow: hidden;
+}
+
+.contacts__noname {
+  color: var(--c-text-dim);
+  font-weight: var(--fw-regular);
+}
+
+.contacts__cta {
+  margin-top: var(--sp-20);
+}
+
+.contacts-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  padding-bottom: var(--sp-8);
+}
+
+.contacts-sheet__who {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  min-width: 0;
+  margin-bottom: var(--sp-4);
+}
+
+.contacts-sheet__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  margin-top: var(--sp-12);
+  padding-top: var(--sp-16);
+  border-top: 1px solid var(--c-border);
+}
+
+.contacts-sheet .contacts-sheet__delete {
+  color: var(--c-danger-text);
+}

@@ -1,0 +1,104 @@
+.ui-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-overlay) + 10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-24) calc(var(--sp-24) + var(--safe-r)) calc(var(--sp-24) + var(--safe-b))
+    calc(var(--sp-24) + var(--safe-l));
+}
+.ui-dialog__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--c-backdrop);
+  animation: ui-fade-in var(--dur-fast) ease both;
+}
+.ui-dialog__panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 340px;
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-dialog);
+  background: var(--c-sheet);
+  color: var(--c-text);
+  outline: none;
+  animation: ui-dialog-in var(--dur-base) var(--ease-out) both;
+}
+.ui-dialog__content {
+  overflow-y: auto;
+  padding: var(--sp-24) var(--sp-24) var(--sp-12);
+  text-align: center;
+}
+.ui-dialog__title {
+  font-size: var(--fs-18);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+}
+.ui-dialog__body {
+  margin-top: var(--sp-12);
+  color: var(--c-text-dim);
+  font-size: var(--fs-16);
+  line-height: var(--lh-body);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.ui-dialog__title + .ui-dialog__body {
+  min-height: 24px;
+}
+.ui-dialog__actions {
+  display: flex;
+  flex: none;
+  margin-top: var(--sp-12);
+  border-top: 1px solid var(--c-border);
+}
+.ui-dialog__btn {
+  flex: 1 1 0;
+  min-height: 56px;
+  padding: var(--sp-16) var(--sp-8);
+  color: var(--c-text);
+  font-size: var(--fs-16);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-bold);
+}
+.ui-dialog__btn + .ui-dialog__btn {
+  border-left: 1px solid var(--c-border);
+}
+.ui-dialog__btn:active {
+  background: var(--c-pressed-overlay);
+}
+.ui-dialog__btn--confirm {
+  color: var(--c-accent);
+}
+.ui-dialog__btn--confirm.is-danger {
+  color: var(--c-danger-text);
+}
+.ui-dialog.is-closing .ui-dialog__backdrop {
+  animation: ui-fade-out 160ms ease both;
+}
+.ui-dialog.is-closing .ui-dialog__panel {
+  animation: ui-dialog-out 160ms ease-in both;
+}
+@keyframes ui-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes ui-dialog-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}

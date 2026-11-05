@@ -1,0 +1,130 @@
+/* App shell: banner on top, one stage below it. Tabs scroll inside the stage;
+   overlays (connect, room) cover the stage and the bottom nav. */
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--c-bg);
+}
+
+.shell-banner {
+  flex: 0 0 auto;
+  padding: calc(var(--safe-t) + var(--sp-4)) calc(var(--sp-12) + var(--safe-r)) var(--sp-4)
+    calc(var(--sp-12) + var(--safe-l));
+  background: var(--c-warning-soft);
+  color: var(--c-warning);
+  text-align: center;
+}
+.shell-banner__text {
+  display: block;
+  overflow: hidden;
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shell__stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  /* The banner already cleared the top safe area. */
+  --safe-t: 0px;
+}
+
+.shell__tab {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Clear the fixed BottomNav. */
+  padding-bottom: calc(var(--bottom-nav-h) + var(--safe-b));
+}
+
+/* The tab container already clears the nav; screens that add .ui-has-nav
+   themselves only need a little breathing room. */
+.shell__tab .ui-has-nav {
+  padding-bottom: var(--sp-16);
+}
+
+.shell__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: calc(var(--z-nav) + 5);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--c-bg);
+  animation: shell-overlay-in var(--dur-base) ease;
+}
+.shell__overlay > * {
+  flex: 1 0 auto;
+  min-height: 100%;
+}
+@keyframes shell-overlay-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Boot */
+.shell-boot {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-16);
+  padding: var(--sp-32) var(--sp-24) calc(var(--sp-32) + var(--safe-b));
+  text-align: center;
+}
+.shell-boot__name {
+  font-family: var(--font-num);
+  font-size: var(--fs-32);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+}
+.shell-boot__warn {
+  display: inline-flex;
+  color: var(--c-warning);
+}
+.shell-boot__detail {
+  max-width: 100%;
+  padding: var(--sp-8) var(--sp-12);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  color: var(--c-text-dim);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* First-run card */
+.shell-intro {
+  padding-top: var(--sp-12);
+}
+.shell-intro__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-8);
+}
+.shell-intro__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  margin: var(--sp-8) 0 0;
+  padding-left: var(--sp-20);
+  list-style: decimal;
+}

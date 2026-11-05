@@ -1,0 +1,280 @@
+.room {
+  display: flex;
+  flex-direction: column;
+  /* Fills the shell overlay, which already sits below the demo banner. */
+  height: 100%;
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  background: var(--c-bg);
+  overflow: hidden;
+}
+
+/* ---- summary ---- */
+
+.room__summary {
+  flex: none;
+  padding: var(--sp-8) var(--sp-16) 0;
+}
+
+.room__summary-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  width: 100%;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.room__summary-amount {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-18);
+  text-align: right;
+}
+
+.room__caret {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin: 0 var(--sp-4) 3px;
+  border-right: 2px solid var(--c-text-dim);
+  border-bottom: 2px solid var(--c-text-dim);
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.room__caret--open {
+  margin-bottom: -3px;
+  transform: rotate(-135deg);
+}
+
+.room__summary-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-8);
+  border-top: 1px solid var(--c-border);
+}
+
+.room__line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-8);
+  font-size: var(--fs-14);
+}
+
+.room__who {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 32%;
+  color: var(--c-text-dim);
+}
+
+.room__side {
+  flex: none;
+  font-weight: 700;
+}
+
+.room__side--buy {
+  color: var(--c-success);
+}
+
+.room__side--sell {
+  color: var(--c-danger-text);
+}
+
+.room__line-amount {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+}
+
+.room__line-fee {
+  flex: none;
+  min-width: 52px;
+  text-align: right;
+}
+
+.room__sats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding-top: var(--sp-6);
+  border-top: 1px dashed var(--c-border);
+}
+
+.room__sats-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-8);
+  font-size: var(--fs-14);
+}
+
+.room__sats-note {
+  margin: 0;
+}
+
+.room__unmatched {
+  margin: 0;
+  padding: var(--sp-4) 0;
+  text-align: center;
+}
+
+/* ---- messages ---- */
+
+.room__messages {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding: var(--sp-12) var(--sp-16);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.room__system {
+  align-self: center;
+  max-width: 88%;
+  margin: var(--sp-4) 0;
+  text-align: center;
+}
+
+.room__msg {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-6);
+  max-width: 100%;
+}
+
+.room__msg--mine {
+  flex-direction: row-reverse;
+}
+
+.room__bubble {
+  min-width: 0;
+  max-width: 80%;
+  padding: var(--sp-8) var(--sp-12);
+  border-radius: var(--radius-dialog);
+  font-size: var(--fs-16);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.room__msg--mine .room__bubble {
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+  border-bottom-right-radius: var(--radius-xs);
+}
+
+.room__msg--theirs .room__bubble {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  border-bottom-left-radius: var(--radius-xs);
+}
+
+.room__time {
+  flex: none;
+  font-size: var(--fs-10);
+  color: var(--c-text-faint);
+}
+
+.room__ln {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-6);
+  max-width: 100%;
+  margin: 2px 0;
+  padding: 2px 2px 2px var(--sp-8);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  vertical-align: middle;
+}
+
+.room__ln-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--fs-12);
+}
+
+.room__ln-copy {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 32px;
+  padding: 0 var(--sp-8);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.room__ln-copy:active {
+  opacity: 0.7;
+}
+
+/* ---- composer ---- */
+
+.room__composer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding: var(--sp-8) var(--sp-16) calc(var(--sp-8) + var(--safe-b, 0px));
+  border-top: 1px solid var(--c-border);
+  background: var(--c-bg);
+}
+
+.room__shortcuts {
+  display: flex;
+  gap: var(--sp-8);
+}
+
+.room__input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+}
+
+.room__input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- done sheet ---- */
+
+.room__notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding: var(--sp-12);
+  border-radius: var(--radius-md);
+  background: var(--c-warning-soft);
+  font-size: var(--fs-14);
+  line-height: 1.5;
+}
+
+.room__notice p {
+  margin: 0;
+}

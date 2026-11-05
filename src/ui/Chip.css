@@ -1,0 +1,45 @@
+/* Coconut chip: pill (radius 32), 12px text, 0.5px border; selected = bold + 1px border + tinted fill */
+.ui-chip {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  min-width: 40px;
+  height: 32px;
+  padding: 0 var(--sp-12);
+  border: 0.5px solid var(--c-border-strong);
+  border-radius: var(--radius-sheet);
+  background: transparent;
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-regular);
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease;
+}
+button.ui-chip::after {
+  content: '';
+  position: absolute;
+  inset: -6px -2px;
+}
+.ui-chip.is-selected {
+  border-width: 1px;
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  font-weight: var(--fw-bold);
+}
+button.ui-chip:active:not(:disabled) {
+  opacity: 0.6;
+}
+.ui-chip.is-disabled {
+  opacity: 0.4;
+}
+.ui-chip__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

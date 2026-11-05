@@ -1,0 +1,99 @@
+.ui-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+}
+.ui-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--c-backdrop);
+  animation: ui-fade-in var(--dur-base) ease both;
+}
+.ui-sheet__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--app-max-width);
+  max-height: 95vh;
+  max-height: 95dvh;
+  margin: 0 auto;
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--c-sheet);
+  color: var(--c-text);
+  box-shadow: 0 -8px 32px var(--c-shadow);
+  outline: none;
+  animation: ui-sheet-in var(--dur-base) var(--ease-out) both;
+}
+.ui-sheet__grab {
+  flex: none;
+  width: 36px;
+  height: 4px;
+  margin: var(--sp-8) auto 0;
+  border-radius: 2px;
+  background: var(--c-border-strong);
+}
+.ui-sheet__header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-8);
+  min-height: var(--h-md);
+  padding: var(--sp-12) var(--sp-16) var(--sp-4) var(--sp-24);
+}
+.ui-sheet__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--fs-18);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+}
+.ui-sheet__close {
+  margin-left: auto;
+}
+.ui-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--sp-8) var(--sp-16) calc(var(--sp-20) + var(--safe-b));
+  padding-left: calc(var(--sp-16) + var(--safe-l));
+  padding-right: calc(var(--sp-16) + var(--safe-r));
+}
+.ui-sheet__footer {
+  flex: none;
+  padding: var(--sp-12) calc(var(--sp-16) + var(--safe-r)) calc(var(--sp-16) + var(--safe-b))
+    calc(var(--sp-16) + var(--safe-l));
+  border-top: 1px solid var(--c-border);
+}
+/* with a footer the body does not need to clear the home indicator itself */
+.ui-sheet__body:has(+ .ui-sheet__footer) {
+  padding-bottom: var(--sp-16);
+}
+.ui-sheet.is-closing .ui-sheet__backdrop {
+  animation: ui-fade-out var(--dur-base) ease both;
+}
+.ui-sheet.is-closing .ui-sheet__panel {
+  animation: ui-sheet-out 200ms ease-in both;
+}
+
+@keyframes ui-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes ui-sheet-out {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}

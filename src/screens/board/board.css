@@ -1,0 +1,343 @@
+.board {
+  min-height: 100%;
+}
+
+.board__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  padding-top: var(--sp-4);
+}
+
+.board__rates {
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+  overflow-wrap: anywhere;
+}
+
+.board__sort {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-8);
+}
+
+/* ---- two columns: buying on the left, selling on the right ---- */
+
+.board__cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-8);
+  align-items: start;
+}
+
+.board-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  min-width: 0;
+}
+
+.board-col__title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  min-height: 24px;
+  padding: 0 var(--sp-4);
+  color: var(--c-text-dim);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+}
+.board-col.is-mine .board-col__title {
+  color: var(--c-text);
+}
+.board-col__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--sp-6);
+  border-radius: var(--radius-pill);
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  font-size: var(--fs-12);
+  line-height: 1;
+}
+
+.board-col__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  min-width: 0;
+}
+
+/* ---- empty slots ---- */
+
+.board-slot {
+  border: 1px dashed var(--c-border);
+  border-radius: var(--radius-lg);
+}
+/* Before posting: both columns are closed on purpose. */
+.board-slot--locked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  color: var(--c-text-faint);
+}
+.board-slot--wait {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-16) var(--sp-12);
+}
+.board-slot__title {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+}
+.board-slot__body {
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+
+.board__empty-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  width: min(280px, 100vw - 80px);
+}
+
+/* ---- my offer ---- */
+
+.board-mine {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+.board-mine__amount {
+  max-width: 100%;
+  margin-top: var(--sp-4);
+  font-size: var(--fs-18);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+  overflow-wrap: anywhere;
+}
+.board-mine__amount.is-long {
+  font-size: 15px;
+}
+.board-mine__fee {
+  font-size: var(--fs-14);
+  line-height: var(--lh-body);
+}
+.board-mine__meta {
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+.board-mine__actions {
+  display: flex;
+  gap: var(--sp-8);
+  margin-top: var(--sp-8);
+}
+
+.board-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding: 0 var(--sp-4);
+}
+.board-status__text {
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+
+/* ---- a matched contact ---- */
+
+.board-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.board-row__who {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  min-width: 0;
+  margin-bottom: var(--sp-4);
+}
+.board-row__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+}
+.board-row__name.is-key {
+  color: var(--c-text-dim);
+  font-family: var(--font-num);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-regular);
+}
+.board-row__amount {
+  font-size: var(--fs-18);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+  overflow-wrap: anywhere;
+}
+.board-row__amount.is-long {
+  font-size: 15px;
+}
+.board-row__fee {
+  font-size: var(--fs-14);
+  line-height: var(--lh-body);
+}
+.board-row__trade {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-8);
+  border-top: 1px solid var(--c-border);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+.board-row__trade-label {
+  color: var(--c-text-dim);
+}
+.board-row__trade-value {
+  color: var(--c-accent);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  overflow-wrap: anywhere;
+}
+.board-row__sats {
+  color: var(--c-text-dim);
+  overflow-wrap: anywhere;
+}
+
+.board__footnote {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  padding: var(--sp-4);
+  color: var(--c-text-faint);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+.board__footnote svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+/* ---- post / edit sheet ---- */
+
+.offer-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+}
+.offer-form__pair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+.offer-form__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+.offer-form__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-8);
+}
+
+.offer-form__sign {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: -4px;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  font-size: var(--fs-16);
+  line-height: 1;
+}
+/* 44px touch target around the 32px key */
+.offer-form__sign::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+.offer-form__sign:active:not(:disabled) {
+  opacity: 0.6;
+}
+.offer-form__sign:disabled {
+  color: var(--c-disabled-text);
+}
+
+.offer-form__warn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-8);
+  padding: var(--sp-12);
+  border-radius: var(--radius-md);
+  background: var(--c-warning-soft);
+  color: var(--c-warning);
+  font-size: var(--fs-14);
+  line-height: var(--lh-body);
+}
+.offer-form__warn svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.offer-form__preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-12) var(--sp-16);
+  border-radius: var(--radius-md);
+  background: var(--c-accent-soft);
+}
+.offer-form__preview.is-empty {
+  background: var(--c-surface-2);
+}
+.offer-form__preview-main {
+  color: var(--c-accent);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+}
+.offer-form__preview.is-empty .offer-form__preview-main {
+  color: var(--c-text-dim);
+  font-weight: var(--fw-regular);
+}
+.offer-form__preview-sub {
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+
+.offer-form__privacy {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  color: var(--c-text-faint);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+.offer-form__privacy svg {
+  flex: none;
+  margin-top: 1px;
+}

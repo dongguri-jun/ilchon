@@ -1,0 +1,47 @@
+/* Coconut appbar: 56px, centered 16px title, 24px icons, transparent over the page */
+.ui-appbar {
+  background: var(--c-bg);
+  padding-top: var(--safe-t);
+  padding-left: var(--safe-l);
+  padding-right: var(--safe-r);
+}
+.ui-appbar.is-sticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-appbar);
+}
+.ui-appbar.has-border {
+  border-bottom: 1px solid var(--c-border);
+}
+.ui-appbar__inner {
+  display: grid;
+  grid-template-columns: minmax(var(--touch), 1fr) minmax(0, auto) minmax(var(--touch), 1fr);
+  align-items: center;
+  width: 100%;
+  max-width: var(--app-max-width);
+  height: var(--appbar-h);
+  margin: 0 auto;
+  padding: 0 var(--sp-4);
+}
+.ui-appbar__side {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+.ui-appbar__side--left {
+  justify-content: flex-start;
+}
+.ui-appbar__side--right {
+  justify-content: flex-end;
+}
+.ui-appbar__title {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+  font-size: var(--fs-16);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+}

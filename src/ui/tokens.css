@@ -1,0 +1,513 @@
+/*
+ * ilchon design tokens. A web port of the Coconut Design System
+ * (github.com/noncelab/coconut_design_system, MIT): colors.dart, styles.dart,
+ * sizes.dart, typography.dart. Dark is the default theme; light is opt-in via
+ * <html data-theme="light">.
+ */
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Pretendard-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/Pretendard-Bold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'SpaceGrotesk';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/SpaceGrotesk-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'SpaceGrotesk';
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/SpaceGrotesk-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'SpaceGrotesk';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/SpaceGrotesk-Bold.ttf') format('truetype');
+}
+
+:root {
+  color-scheme: dark;
+
+  /* ---- Coconut raw palette (CoconutColors) ---- */
+  --coco-primary: #deff58;
+  --coco-black: #141318;
+  --coco-white: #ffffff;
+  --coco-gray-100: #fcfcfc;
+  --coco-gray-150: #f5f5f5;
+  --coco-gray-200: #eeeeee;
+  --coco-gray-300: #dfdfdf;
+  --coco-gray-350: #c8c8c8;
+  --coco-gray-400: #b7b7b7;
+  --coco-gray-500: #949494;
+  --coco-gray-600: #777777;
+  --coco-gray-700: #555555;
+  --coco-gray-750: #3d3d3d;
+  --coco-gray-800: #303030;
+  --coco-gray-850: #232323;
+  --coco-gray-900: #1c1c1c;
+
+  /* ---- Semantic colors: dark (default) ---- */
+  --c-bg: #141318;
+  --c-surface: #1c1c1c;
+  --c-surface-2: #303030;
+  --c-sheet: #1c1c1c;
+  --c-border: #3d3d3d;
+  --c-border-strong: #515160;
+  --c-text: #ffffff;
+  --c-text-dim: #949494;
+  --c-text-faint: #777777;
+  --c-primary: #deff58;
+  --c-on-primary: #141318;
+  --c-primary-pressed: rgba(222, 255, 88, 0.5);
+  --c-primary-soft: rgba(222, 255, 88, 0.14);
+  /* Accent for text/icons on the page background: lime in dark, green in light. */
+  --c-accent: #deff58;
+  --c-accent-soft: rgba(222, 255, 88, 0.14);
+
+  --c-danger: #db3937;
+  --c-danger-text: #ee6579;
+  --c-danger-soft: rgba(206, 91, 111, 0.2);
+  --c-on-danger: #ffffff;
+  --c-danger-pressed: rgba(219, 57, 55, 0.5);
+  --c-success: #88c125;
+  --c-success-soft: rgba(146, 199, 154, 0.18);
+  --c-warning: #ffaf03;
+  --c-warning-soft: rgba(246, 215, 118, 0.18);
+  --c-info: #41a4d8;
+  --c-info-soft: rgba(145, 179, 242, 0.18);
+
+  --c-disabled-bg: #303030;
+  --c-disabled-text: #555555;
+  --c-pressed-overlay: rgba(255, 255, 255, 0.08);
+  --c-backdrop: rgba(0, 0, 0, 0.6);
+  --c-shadow: rgba(0, 0, 0, 0.5);
+
+  /* segmented control (Coconut: container gray800, selected gray900) */
+  --c-seg-bg: #303030;
+  --c-seg-selected: #1c1c1c;
+  --c-seg-selected-text: #ffffff;
+  --c-seg-text: #949494;
+
+  /* switch (Coconut: on = onBlack track + onWhite thumb) */
+  --c-switch-on-track: #ffffff;
+  --c-switch-on-thumb: #141318;
+  --c-switch-off-track: #777777;
+  --c-switch-off-thumb: #fcfcfc;
+
+  /* inverted toast (Coconut: white on dark theme) */
+  --c-toast-bg: #ffffff;
+  --c-toast-text: #1c1c1c;
+  --c-toast-border: #dfdfdf;
+
+  /* Avatar / chart palette (CoconutColors.colorPalette + backgroundColorPaletteDark) */
+  --c-pal-0: #a364d9;
+  --c-pal-1: #fa9c5a;
+  --c-pal-2: #fecc2f;
+  --c-pal-3: #88c125;
+  --c-pal-4: #41a4d8;
+  --c-pal-5: #ee6579;
+  --c-pal-6: #db3937;
+  --c-pal-7: #f56321;
+  --c-pal-8: #949494;
+  --c-pal-9: #33bfb8;
+  --c-pal-bg-0: rgba(167, 122, 254, 0.18);
+  --c-pal-bg-1: rgba(242, 147, 146, 0.18);
+  --c-pal-bg-2: rgba(246, 215, 118, 0.18);
+  --c-pal-bg-3: rgba(146, 199, 154, 0.18);
+  --c-pal-bg-4: rgba(145, 179, 242, 0.18);
+  --c-pal-bg-5: rgba(235, 140, 215, 0.18);
+  --c-pal-bg-6: rgba(206, 91, 111, 0.18);
+  --c-pal-bg-7: rgba(229, 164, 103, 0.18);
+  --c-pal-bg-8: rgba(230, 230, 230, 0.18);
+  --c-pal-bg-9: rgba(158, 226, 230, 0.18);
+
+  /* ---- Spacing (Sizes / CoconutLayout), px ---- */
+  --sp-2: 2px;
+  --sp-4: 4px;
+  --sp-6: 6px;
+  --sp-8: 8px;
+  --sp-12: 12px;
+  --sp-16: 16px;
+  --sp-20: 20px;
+  --sp-24: 24px;
+  --sp-28: 28px;
+  --sp-32: 32px;
+  --sp-40: 40px;
+  --sp-48: 48px;
+  --sp-64: 64px;
+  --gutter: 12px;
+  --page-pad: 16px;
+
+  /* ---- Radius (CoconutStyles) ---- */
+  --radius-xs: 4px; /* radius_50: chips (rect), tiny indicators */
+  --radius-sm: 8px; /* radius_100 */
+  --radius-badge: 10px; /* radius_150: small buttons, badges, tags */
+  --radius-md: 12px; /* radius_200: CTA buttons, inputs, toasts */
+  --radius-dialog: 16px; /* radius_250: popups, tooltips */
+  --radius-lg: 20px; /* radius_300: cards, menus */
+  --radius-xl: 24px; /* radius_400: hero cards */
+  --radius-sheet: 32px; /* radius_500: bottom sheet top corners */
+  --radius-pill: 999px;
+
+  /* ---- Typography (CoconutTypography) ---- */
+  --font-text: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR',
+    'Segoe UI', Roboto, sans-serif;
+  --font-num: 'SpaceGrotesk', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  --fs-10: 10px;
+  --fs-12: 12px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-18: 18px;
+  --fs-21: 21px;
+  --fs-28: 28px;
+  --fs-32: 32px;
+  --lh-tight: 1.2; /* font-size >= 24 */
+  --lh-body: 1.4;
+  --fw-regular: 400;
+  --fw-bold: 700;
+
+  /* ---- Control heights ---- */
+  --h-sm: 36px;
+  --h-md: 44px;
+  --h-lg: 52px;
+  --h-input: 56px;
+  --touch: 44px;
+  --appbar-h: 56px;
+  --bottom-nav-h: 60px;
+  --app-max-width: 560px;
+
+  /* ---- Motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+
+  /* ---- Safe-area insets ---- */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+
+  --z-appbar: 20;
+  --z-nav: 30;
+  --z-overlay: 100;
+  --z-toast: 200;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --c-bg: #ffffff;
+  --c-surface: #f5f5f5;
+  --c-surface-2: #eeeeee;
+  --c-sheet: #ffffff;
+  --c-border: #dfdfdf;
+  --c-border-strong: #b7b7b7;
+  --c-text: #141318;
+  --c-text-dim: #777777;
+  --c-text-faint: #b7b7b7;
+  --c-primary: #deff58;
+  --c-on-primary: #141318;
+  --c-primary-pressed: rgba(222, 255, 88, 0.5);
+  --c-primary-soft: rgba(222, 255, 88, 0.45);
+  --c-accent: #5e8a0a;
+  --c-accent-soft: rgba(136, 193, 37, 0.16);
+
+  --c-danger: #db3937;
+  --c-danger-text: #db3937;
+  --c-danger-soft: rgba(219, 57, 55, 0.13);
+  --c-danger-pressed: rgba(219, 57, 55, 0.5);
+  --c-success: #267343;
+  --c-success-soft: rgba(178, 193, 37, 0.13);
+  --c-warning: #b97a00;
+  --c-warning-soft: rgba(254, 204, 47, 0.2);
+  --c-info: #2a86b8;
+  --c-info-soft: rgba(65, 164, 216, 0.1);
+
+  --c-disabled-bg: #f5f5f5;
+  --c-disabled-text: #c8c8c8;
+  --c-pressed-overlay: rgba(20, 19, 24, 0.06);
+  --c-backdrop: rgba(20, 19, 24, 0.45);
+  --c-shadow: rgba(20, 19, 24, 0.12);
+
+  --c-seg-bg: #f5f5f5;
+  --c-seg-selected: #1c1c1c;
+  --c-seg-selected-text: #ffffff;
+  --c-seg-text: #b7b7b7;
+
+  --c-switch-on-track: #141318;
+  --c-switch-on-thumb: #ffffff;
+  --c-switch-off-track: #dfdfdf;
+  --c-switch-off-thumb: #ffffff;
+
+  --c-toast-bg: #1c1c1c;
+  --c-toast-text: #ffffff;
+  --c-toast-border: #555555;
+
+  --c-pal-8: #777777;
+  --c-pal-bg-0: rgba(163, 100, 217, 0.13);
+  --c-pal-bg-1: rgba(250, 156, 90, 0.13);
+  --c-pal-bg-2: rgba(254, 204, 47, 0.13);
+  --c-pal-bg-3: rgba(178, 193, 37, 0.13);
+  --c-pal-bg-4: rgba(65, 164, 216, 0.1);
+  --c-pal-bg-5: rgba(238, 101, 121, 0.12);
+  --c-pal-bg-6: rgba(219, 57, 55, 0.13);
+  --c-pal-bg-7: rgba(245, 99, 33, 0.13);
+  --c-pal-bg-8: rgba(101, 101, 101, 0.1);
+  --c-pal-bg-9: rgba(51, 191, 184, 0.1);
+}
+
+/* ---- Shared keyframes ---- */
+@keyframes ui-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ui-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ---- Base ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--c-bg);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-text);
+  font-size: var(--fs-16);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-regular);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  /* Korean: break between words, not mid-word; long tokens still wrap. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+a {
+  color: var(--c-accent);
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+}
+
+/* ---- Helpers ---- */
+
+/* Numbers: SpaceGrotesk with tabular figures. */
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.safe-t {
+  padding-top: var(--safe-t);
+}
+.safe-b {
+  padding-bottom: var(--safe-b);
+}
+.safe-x {
+  padding-left: var(--safe-l);
+  padding-right: var(--safe-r);
+}
+.safe-all {
+  padding: var(--safe-t) var(--safe-r) var(--safe-b) var(--safe-l);
+}
+
+/* Centered mobile column. On desktop the app stays phone-width. */
+.ui-page {
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding-left: calc(var(--page-pad) + var(--safe-l));
+  padding-right: calc(var(--page-pad) + var(--safe-r));
+}
+/* Add to the scroll container on screens that show a BottomNav. */
+.ui-has-nav {
+  padding-bottom: calc(var(--bottom-nav-h) + var(--safe-b) + var(--sp-16));
+}
+
+.ui-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+}
+.ui-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+}
+.ui-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Text styles (CoconutTypography: heading1_32 ... caption_10). */
+.t-h1 {
+  font-size: var(--fs-32);
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-bold);
+}
+.t-h2 {
+  font-size: var(--fs-28);
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-bold);
+}
+.t-h3 {
+  font-size: var(--fs-21);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-bold);
+}
+.t-h4 {
+  font-size: var(--fs-18);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-bold);
+}
+.t-body1 {
+  font-size: var(--fs-16);
+  line-height: var(--lh-body);
+}
+.t-body2 {
+  font-size: var(--fs-14);
+  line-height: var(--lh-body);
+}
+.t-body3 {
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+}
+.t-caption {
+  font-size: var(--fs-10);
+  line-height: var(--lh-body);
+}
+.t-bold {
+  font-weight: var(--fw-bold);
+}
+.t-dim {
+  color: var(--c-text-dim);
+}
+.t-accent {
+  color: var(--c-accent);
+}
+.t-danger {
+  color: var(--c-danger-text);
+}
+.t-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

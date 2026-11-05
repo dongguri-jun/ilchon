@@ -1,0 +1,250 @@
+/* Fills the shell overlay (below the demo banner, above the tabs). */
+.connect {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--c-bg);
+  color: var(--c-text);
+}
+
+.connect__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.connect__page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+  padding-top: var(--sp-8);
+  padding-bottom: calc(var(--sp-32) + var(--safe-b));
+}
+
+.connect__lead {
+  margin: 0;
+}
+
+/* ---- checklist */
+.connect__steps {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--sp-4) var(--sp-16);
+  list-style: none;
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+}
+
+.connect__step {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  min-height: 48px;
+}
+
+.connect__step + .connect__step {
+  border-top: 1px solid var(--c-border);
+}
+
+.connect__step-mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--c-border-strong);
+  border-radius: 50%;
+  color: var(--c-text-dim);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+}
+
+.connect__step-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.connect__step-state {
+  flex: none;
+  color: var(--c-text-faint);
+}
+
+.connect__step.is-waiting .connect__step-mark {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+.connect__step.is-waiting .connect__step-state {
+  color: var(--c-accent);
+}
+
+.connect__step.is-done .connect__step-mark {
+  border-color: var(--c-success);
+  background: var(--c-success);
+  color: var(--c-bg);
+}
+
+.connect__step.is-done .connect__step-label {
+  color: var(--c-text-dim);
+}
+
+.connect__step.is-done .connect__step-state {
+  color: var(--c-success);
+}
+
+/* ---- panels */
+.connect__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+}
+
+.connect__panel--center,
+.connect__panel--note {
+  align-items: center;
+  text-align: center;
+}
+
+.connect__panel--note {
+  gap: var(--sp-16);
+  padding: var(--sp-32) var(--sp-16);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+}
+
+.connect__hint {
+  margin: 0;
+  text-align: center;
+}
+
+.connect__hint--accent {
+  color: var(--c-accent);
+  font-weight: var(--fw-bold);
+}
+
+.connect__hint--warn {
+  color: var(--c-warning);
+}
+
+.connect__qr {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.connect__timer {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+}
+
+.connect__ring {
+  flex: none;
+}
+
+.connect__ring-track,
+.connect__ring-bar {
+  fill: none;
+  stroke-width: 3;
+}
+
+.connect__ring-track {
+  stroke: var(--c-surface-2);
+}
+
+.connect__ring-bar {
+  stroke: var(--c-accent);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 200ms linear;
+}
+
+.connect__ring-bar.is-low {
+  stroke: var(--c-warning);
+}
+
+.connect__ring-num {
+  fill: var(--c-text);
+  font-size: 13px;
+  font-weight: var(--fw-bold);
+}
+
+.connect__scanner {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+.connect__paste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-16);
+  border-top: 1px solid var(--c-border);
+}
+
+/* ---- status blocks */
+.connect__status,
+.connect__done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-12);
+  padding: var(--sp-32) 0 var(--sp-16);
+  text-align: center;
+}
+
+.connect__status p,
+.connect__done h2,
+.connect__done p {
+  margin: 0;
+}
+
+.connect__status-body {
+  max-width: 300px;
+}
+
+.connect__okmark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--c-success-soft);
+  color: var(--c-success);
+}
+
+.connect__okmark--lg {
+  width: 72px;
+  height: 72px;
+}
+
+.connect__done-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  width: 100%;
+  margin-top: var(--sp-16);
+  text-align: left;
+}
+
+.connect__linking {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  padding: var(--sp-12) var(--sp-16);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+}
+
+.connect__linking p {
+  margin: 0;
+}
