@@ -13,7 +13,7 @@ ilchon is a serverless web app for peer-to-peer bitcoin trades between people wh
 1. **Connect in person.** Two people scan each other's one-time QR codes. Only mutual scans create a contact ("ilchon", a first-degree connection). Each user names the contact; the name stays on that device.
 2. **Post an offer.** Buy or sell, KRW or USD, an amount, and a premium over the market price. At this point nobody can see it.
 3. **Match privately.** The app quietly runs a private matching protocol with each contact over Marmot. It tests only "does one of us buy and the other sell, in the same currency?" Amounts do not have to match.
-4. **See only real counterparties.** A contact appears on your board only if they are on the opposite side in the same currency. Only then do the two apps exchange amount and premium.
+4. **See only real counterparties.** A contact appears on your board only if they are on the opposite side in the same currency. Only then do the two apps exchange amount and premium. Amount and premium do not filter; the board sorts by closest amount, or by best premium.
 5. **Trade.** Tap the match to open a private two-person room. Fiat goes by bank transfer, bitcoin by Lightning. Mark the trade done; the remaining amount stays open.
 6. **Disconnect silently.** Deleting a contact stops real matching with them. Your app keeps answering with random values, so they cannot tell you left.
 
@@ -27,6 +27,8 @@ ilchon is a serverless web app for peer-to-peer bitcoin trades between people wh
 | Non-contacts | Not your offer. Someone who knows your app key can see that it uses Marmot | One-time QR, app-only key |
 
 Marmot hides content from relays, but anyone inside a room can read what is posted there. An encrypted group chat alone would still leak "I am selling bitcoin" to every member. Private matching is the second layer: it hides your intent even from contacts who would not trade with you.
+
+We use Marmot not as a group chat but as one two-member MLS group per relationship. Even one-to-one, relays do not see a recipient per message, unlike NIP-17 DMs. Because each relationship is already a group, the next step is adding members to the same room: a mediator both sides agree on, an introducer for second-degree contacts, or your own extra devices.
 
 There is no ilchon server. Every message is an unsigned Nostr rumor (kind 4242) inside a two-member Marmot group. Group messages are signed with a fresh one-time key per message, not the account key. The contact list and names live only on each device.
 
