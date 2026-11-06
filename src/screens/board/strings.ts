@@ -16,7 +16,7 @@ registerStrings(NS, {
 
     emptyTitle: '조건을 올리기 전에는 아무것도 보이지 않아요',
     emptyBody:
-      '내 조건은 반대로 거래하려는 일촌에게만 보여요.\n맞지 않는 일촌은 내가 올렸는지도 알 수 없어요.',
+      '내 조건은 반대로 거래하려는 일촌에게만 보여요.\n맞지 않는 일촌은 내 방향·통화·금액·수수료를 알 수 없어요.',
     post: '조건 올리기',
     connectFirst: '먼저 일촌 연결하기',
 
@@ -94,7 +94,7 @@ registerStrings(NS, {
 
     emptyTitle: 'Nothing shows until you post',
     emptyBody:
-      'Your offer is revealed only to contacts who want the opposite.\nEveryone else can’t even tell you posted.',
+      'Your offer is revealed only to contacts who want the opposite.\nOthers never learn your side, currency, amount or fee.',
     post: 'Post an offer',
     connectFirst: 'Connect a contact first',
 

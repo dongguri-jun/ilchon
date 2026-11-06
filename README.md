@@ -22,7 +22,7 @@ ilchon is a serverless web app for peer-to-peer bitcoin trades between people wh
 | Who | What they see | What stops them |
 |---|---|---|
 | Relays and third parties | Ciphertext only | Marmot (MLS over Nostr) |
-| Contacts on the same side, or with no offer | Nothing | Private matching |
+| Contacts who do not match | Not your side, currency, amount or premium. They can see that a matching round started | Private matching |
 | Contacts on the opposite side | Your amount and premium | Nothing (that is the point) |
 | Non-contacts | Not your offer. Someone who knows your app key can see that it uses Marmot | One-time QR, app-only key |
 

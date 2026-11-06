@@ -66,39 +66,54 @@ async function firstOk(list: Endpoint[]): Promise<number | undefined> {
   return undefined
 }
 
-export function createRatesSource(): RatesSource {
-  let cache: Rates | undefined
-  let cachedAt = 0
-  let inflight: Promise<Rates> | undefined
+/** A price older than this is no longer shown: screens stop converting with it. */
+const STALE_MS = 10 * 60_000
 
-  async function load(): Promise<Rates> {
+type Currency = 'KRW' | 'USD'
+
+export function createRatesSource(): RatesSource {
+  // Per currency: last successfully fetched price and when it was fetched.
+  // A failed fetch never refreshes these timestamps.
+  const last: Partial<Record<Currency, { price: number; at: number }>> = {}
+  let checkedAt = 0
+  let inflight: Promise<void> | undefined
+
+  async function load(): Promise<void> {
     const [KRW, USD] = await Promise.all([firstOk(KRW_ENDPOINTS), firstOk(USD_ENDPOINTS)])
-    const out: Rates = { at: Date.now() }
-    if (KRW !== undefined) out.KRW = KRW
-    if (USD !== undefined) out.USD = USD
-    // keep last good values for a currency that failed this round
-    if (cache) {
-      if (out.KRW === undefined && cache.KRW !== undefined) out.KRW = cache.KRW
-      if (out.USD === undefined && cache.USD !== undefined) out.USD = cache.USD
+    const now = Date.now()
+    if (KRW !== undefined) last.KRW = { price: KRW, at: now }
+    if (USD !== undefined) last.USD = { price: USD, at: now }
+    checkedAt = now
+  }
+
+  /** Only currencies whose last success is fresh. `at` is the oldest included success. */
+  function snapshot(): Rates {
+    const now = Date.now()
+    const out: Rates = {}
+    let oldest: number | undefined
+    for (const c of ['KRW', 'USD'] as const) {
+      const v = last[c]
+      if (!v || now - v.at > STALE_MS) continue
+      out[c] = v.price
+      oldest = oldest === undefined ? v.at : Math.min(oldest, v.at)
     }
-    if (out.KRW !== undefined || out.USD !== undefined) {
-      cache = out
-      cachedAt = Date.now()
-    }
+    out.at = oldest ?? now
     return out
   }
 
   return {
     async fetch(): Promise<Rates> {
       try {
-        if (cache && Date.now() - cachedAt < CACHE_MS) return cache
-        inflight ??= load().finally(() => {
-          inflight = undefined
-        })
-        return await inflight
+        if (Date.now() - checkedAt >= CACHE_MS) {
+          inflight ??= load().finally(() => {
+            inflight = undefined
+          })
+          await inflight
+        }
       } catch {
-        return cache ?? { at: Date.now() }
+        /* keep last successes; snapshot() drops stale ones */
       }
+      return snapshot()
     },
   }
 }

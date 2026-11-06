@@ -276,7 +276,13 @@ function MessageItem(props: { message: ChatMessage; onCopy: (text: string) => vo
   }
 
   return (
-    <div className={cx('room__msg', message.mine ? 'room__msg--mine' : 'room__msg--theirs')}>
+    <div
+      className={cx(
+        'room__msg',
+        message.mine ? 'room__msg--mine' : 'room__msg--theirs',
+        message.mine && message.status === 'sending' && 'room__msg--sending',
+      )}
+    >
       <div className="room__bubble">
         {parts.map((part, i) =>
           isLightningToken(part) ? (
@@ -293,7 +299,39 @@ function MessageItem(props: { message: ChatMessage; onCopy: (text: string) => vo
         )}
       </div>
       <span className="room__time num">{formatClock(message.at)}</span>
+      {message.mine && <MessageStatus message={message} />}
     </div>
+  )
+}
+
+function MessageStatus({ message }: { message: ChatMessage }) {
+  const t = useT(ROOM_NS)
+  const toast = useToast()
+  const [retrying, setRetrying] = useState(false)
+  if (message.status === 'sending') {
+    return <span className="room__status room__status--sending t-caption">{t('statusSending')}</span>
+  }
+  if (message.status !== 'failed') return null
+  async function retry() {
+    if (retrying) return
+    setRetrying(true)
+    try {
+      await actions.retryChat(message.contactId, message.id)
+    } catch {
+      toast.show(t('sendFailed'), 'error')
+    } finally {
+      setRetrying(false)
+    }
+  }
+  return (
+    <button
+      type="button"
+      className="room__status room__status--failed t-caption"
+      disabled={retrying}
+      onClick={() => void retry()}
+    >
+      {t('statusFailed')}
+    </button>
   )
 }
 

@@ -457,6 +457,21 @@ class MarmotTransport implements Transport {
       }
       await sleep(400 * (attempt + 1))
     }
+    // The last publish may have landed: read back once more before giving up.
+    this.#assertRunning()
+    try {
+      const { events } = await this.#network.requestAny(this.#relays, {
+        kinds: [ADDRESSABLE_KEY_PACKAGE_KIND],
+        authors: [this.pubkey],
+        '#d': [slot],
+      })
+      if (events.some((found) => found.id === event.id)) {
+        log('key package confirmed on relay', short(event.id))
+        return
+      }
+    } catch (error) {
+      problem = errorText(error)
+    }
     throw new Error(`KeyPackage is not available on any relay: ${problem}`)
   }
 

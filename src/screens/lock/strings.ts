@@ -68,6 +68,8 @@ registerStrings('lock', {
     errIdentityExists: '다른 탭에서 이미 키를 만들었어요. 새로고침해 주세요.',
     errLogN: '이 백업은 이 기기에서 풀기엔 너무 무거워요. 컴퓨터에서 되살려 주세요.',
     errBusy: '처리 중이에요. 잠시만 기다려 주세요.',
+    errCleanupFailed: '이전 키를 지우지 못했어요. 다시 시도해 주세요.',
+    errResetFailed: '초기화를 끝내지 못했어요. 다른 탭을 닫고 다시 시도해 주세요.',
     errPrfUnlock: '이 기기에서 패스키를 읽지 못했어요. 다른 기기나 백업으로 열어 주세요.',
     errPasskeyMismatch: '이 패스키로는 키를 풀 수 없어요. 처음 잠근 패스키로 다시 시도해 주세요.',
 
@@ -147,6 +149,8 @@ registerStrings('lock', {
     errIdentityExists: 'Another tab already created a key. Please reload.',
     errLogN: 'This backup is too heavy to open on this device. Restore it on a computer.',
     errBusy: 'Working on it. Please wait a moment.',
+    errCleanupFailed: "Couldn't remove the old key. Please try again.",
+    errResetFailed: "Reset didn't finish. Close other tabs and try again.",
     errPrfUnlock: "Couldn't read the passkey on this device. Open it on another device or from a backup.",
     errPasskeyMismatch: "This passkey can't unlock the key. Try the passkey you locked it with.",
 

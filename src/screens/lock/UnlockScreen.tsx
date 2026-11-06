@@ -42,9 +42,9 @@ export function UnlockScreen() {
     setResetting(true)
     try {
       await actions.resetAll()
-    } catch {
+    } catch (e) {
       setResetting(false)
-      setErr(t('resetFailed'))
+      setErr(t(errorCode(e) === 'reset-failed' ? 'errResetFailed' : 'resetFailed'))
     }
   }
 

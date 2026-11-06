@@ -38,10 +38,24 @@ function ownedByProfile(name: string): boolean {
   }
 }
 
-function deleteDatabase(name: string): Promise<void> {
+/** How long a deletion blocked by another open connection may take before it counts as failed. */
+const DELETE_BLOCKED_MS = 5_000
+
+/** Resolves true once the database is gone; false on error or when it stays blocked. */
+function deleteDatabase(name: string): Promise<boolean> {
   return new Promise((resolve) => {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const done = (ok: boolean) => {
+      if (timer !== undefined) clearTimeout(timer)
+      resolve(ok)
+    }
     const req = indexedDB.deleteDatabase(name)
-    req.onsuccess = req.onerror = req.onblocked = () => resolve()
+    req.onsuccess = () => done(true)
+    req.onerror = () => done(false)
+    // Blocked may still turn into success when the other connection closes.
+    req.onblocked = () => {
+      timer ??= setTimeout(() => resolve(false), DELETE_BLOCKED_MS)
+    }
   })
 }
 
@@ -49,23 +63,28 @@ function deleteDatabase(name: string): Promise<void> {
  * The Transport contract has no "wipe" call, so reset removes every IndexedDB
  * database and localStorage entry named after this profile. The engine also
  * gives each identity its own transport namespace, so anything this sweep
- * misses is never read again.
+ * misses is never read again. Resolves false when something could not be deleted.
  */
-async function wipeProfileStores(): Promise<void> {
+async function wipeProfileStores(): Promise<boolean> {
+  let ok = true
+  // indexedDB.databases() is missing in some browsers; the named purge in onReset covers that case.
+  let names: string[] = []
   try {
-    const dbs = (await indexedDB.databases?.()) ?? []
-    await Promise.all(dbs.flatMap((d) => (d.name && ownedByProfile(d.name) ? [deleteDatabase(d.name)] : [])))
+    names = ((await indexedDB.databases?.()) ?? []).flatMap((d) => (d.name && ownedByProfile(d.name) ? [d.name] : []))
   } catch {
-    // best effort
+    names = []
   }
+  const results = await Promise.all(names.map(deleteDatabase))
+  if (results.includes(false)) ok = false
   try {
     for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i)
       if (key && ownedByProfile(key)) localStorage.removeItem(key)
     }
   } catch {
-    // best effort
+    ok = false
   }
+  return ok
 }
 
 export const engine = createEngine(
@@ -82,11 +101,18 @@ export const engine = createEngine(
   },
   {
     defaultLang: getLang(),
-    async onReset() {
-      const pubkey = engine.store.getState().me?.pubkey
+    async onReset({ pubkey }) {
+      let ok = true
       // Named deletion first: indexedDB.databases() is missing in some browsers.
-      if (pubkey) await marmotModule.purgeMarmotStorage(transportNamespace(namespace, pubkey), pubkey).catch(() => {})
-      await wipeProfileStores()
+      // `pubkey` comes from the engine, which knows it from storage even while locked.
+      if (pubkey) {
+        await marmotModule.purgeMarmotStorage(transportNamespace(namespace, pubkey), pubkey).catch(() => {
+          ok = false
+        })
+      }
+      if (!(await wipeProfileStores())) ok = false
+      // The engine turns this into 'reset-failed'; reloading now would look like a finished wipe.
+      if (!ok) throw new Error('reset-failed')
       location.reload()
     },
     onExternalChange() {

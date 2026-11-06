@@ -28,6 +28,10 @@ export function errorKey(e: unknown, ctx?: 'unlock'): string {
       return 'errReauth'
     case 'busy':
       return 'errBusy'
+    case 'cleanup-failed':
+      return 'errCleanupFailed'
+    case 'reset-failed':
+      return 'errResetFailed'
     case 'corrupt':
       return ctx === 'unlock' ? 'errPasskeyMismatch' : 'errCorrupt'
     default:

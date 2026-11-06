@@ -80,9 +80,10 @@ export function SettingsScreen() {
     setResetting(true)
     try {
       await actions.resetAll()
-    } catch {
+    } catch (e) {
       setResetting(false)
-      toast.show(t('resetFailed'), 'error')
+      const code = e instanceof Error ? e.message : String(e)
+      toast.show(t(code === 'reset-failed' ? 'resetFailedTabs' : 'resetFailed'), 'error')
     }
   }
 

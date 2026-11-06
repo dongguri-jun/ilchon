@@ -291,6 +291,12 @@ export interface ChatMessage {
   kind: 'text' | 'system'
   text: string
   at: number
+  /**
+   * Delivery of my own text messages only. 'sending' until a relay took it,
+   * 'failed' once every retry failed (retryChat sends it again). Undefined
+   * means sent (older stored messages, and everything that is not mine).
+   */
+  status?: 'sending' | 'sent' | 'failed'
 }
 
 export type ConnectPhase =
@@ -415,7 +421,10 @@ export interface IlchonActions {
    */
   deleteContact(id: PubkeyHex): Promise<void>
 
+  /** Appends my message with status 'sending' and returns; the status follows delivery. */
   sendChat(contactId: PubkeyHex, text: string): Promise<void>
+  /** Sends a 'failed' message of mine again and sets it back to 'sending'. */
+  retryChat(contactId: PubkeyHex, messageId: string): Promise<void>
   /** Record a completed trade; reduces my open amount, withdraws at zero. */
   markDone(contactId: PubkeyHex, amount: number): Promise<void>
 
@@ -428,7 +437,9 @@ export interface IlchonActions {
    * 'wrong-password' | 'passkey-cancelled' | 'prf-unsupported' |
    * 'invalid-ncryptsec' | 'weak-password' | 'not-allowed' | 'corrupt' | 'no-vault' |
    * 'busy' | 'passkey-confirm' (passkey made, tap again to read it) |
-   * 'reauth-required' | 'identity-exists' (another tab made one) | 'unsupported-log-n'.
+   * 'reauth-required' | 'identity-exists' (another tab made one) | 'unsupported-log-n' |
+   * 'cleanup-failed' (the new lock is stored, but the old plaintext key could
+   * not be deleted; boot retries the deletion and stops in 'error' until it works).
    */
   /** Only in boot 'setup': new key, lock it, then finish boot. */
   createIdentity(choice: LockChoice): Promise<void>
@@ -455,7 +466,11 @@ export interface IlchonActions {
   exportBackup(password: string): Promise<string>
   /** The user copied or confirmed saving the backup: sets lock.backedUp (persisted). */
   markBackedUp(): Promise<void>
-  /** Wipes this profile's local data and reloads. */
+  /**
+   * Wipes this profile's local data and reloads. Rejects with 'reset-failed'
+   * (and does not reload) when something could not be deleted; calling it
+   * again retries.
+   */
   resetAll(): Promise<void>
 }
 

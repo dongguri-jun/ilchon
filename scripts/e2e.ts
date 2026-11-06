@@ -178,6 +178,10 @@ async function main(): Promise<void> {
     boots.map((b, i) => `${peers[i].name}=${b.status === 'fulfilled' ? 'ready' : String(b.reason)}`).join(' '),
   )
   if (!bootOk) return
+  // One match round per contact per window, in either role. The scenario re-matches
+  // the same pairs within minutes, so it runs with the 20 s demo window; the
+  // engines defer a blocked round until the window passed.
+  await Promise.all(peers.map((p) => p.engine.actions.setSettings({ demoMode: true })))
 
   // ---- connect: one pair per path
   const ab = await connectPair(A, B, 'inviter-first')
