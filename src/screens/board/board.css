@@ -142,6 +142,8 @@
 }
 .board-mine__actions {
   display: flex;
+  flex-direction: column;
+  width: 100%;
   gap: var(--sp-8);
   margin-top: var(--sp-8);
 }
@@ -350,4 +352,62 @@
   margin: 0 auto;
   object-fit: contain;
   border-bottom: 1px solid var(--c-brand);
+}
+
+/* Narrow columns retain the full registration state and 44px labelled actions. */
+.board-mine__label {
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+}
+.board-mine__status {
+  max-width: 100%;
+}
+.board-mine__status .ui-badge {
+  height: auto;
+  min-height: 22px;
+  padding: var(--sp-4) var(--sp-8);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: var(--lh-body);
+}
+.board-mine__dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  animation: board-checking 1.4s ease-in-out infinite;
+}
+@keyframes board-checking {
+  50% { opacity: 0.3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .board-mine__dot { animation: none; }
+}
+.board-mine__withdraw:not(:disabled) {
+  color: var(--c-danger-text);
+}
+.board-col__hint,
+.offer-form__edit-hint {
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+  overflow-wrap: anywhere;
+}
+.offer-form__sides {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+.offer-form__sides .ui-btn {
+  height: auto;
+  min-height: var(--h-lg);
+  padding: var(--sp-12);
+  text-align: left;
+  justify-content: flex-start;
+  white-space: normal;
+}
+.offer-form__sides .ui-btn__label {
+  overflow: visible;
+  overflow-wrap: anywhere;
 }

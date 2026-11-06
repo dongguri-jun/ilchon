@@ -332,15 +332,22 @@ export interface ConnectState {
 export interface Settings {
   lang: Lang
   sort: SortMode
-  /**
-   * Hackathon demo mode. Shortens the "answer one match round per contact"
-   * window from 24 h to 8 s so a live demo can re-post offers.
-   */
+  /** One completed probe per contact during this rolling window. */
+  matchInterval: 'live' | '10s' | '1m' | '1h' | '24h'
+  /** Legacy field, read only to migrate profiles without matchInterval. */
   demoMode: boolean
 }
 
-export const RESPOND_WINDOW_MS = 24 * 60 * 60 * 1000
-export const RESPOND_WINDOW_DEMO_MS = 8 * 1000
+export const MATCH_INTERVAL_MS: Record<Settings['matchInterval'], number> = {
+  live: 1_000,
+  '10s': 10_000,
+  '1m': 60_000,
+  '1h': 60 * 60_000,
+  '24h': 24 * 60 * 60_000,
+}
+export const RESPOND_WINDOW_MS = MATCH_INTERVAL_MS['24h']
+/** Legacy export for callers using the old demo window. */
+export const RESPOND_WINDOW_DEMO_MS = MATCH_INTERVAL_MS['10s']
 
 // ---------------------------------------------------------------- key vault (src/lib/vault)
 

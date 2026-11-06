@@ -63,3 +63,8 @@ export function formatClock(at: number): string {
   const m = String(d.getMinutes()).padStart(2, '0')
   return `${h}:${m}`
 }
+
+/** A payment invoice, excluding LNURL and address-like tokens. */
+export function isInvoiceToken(token: string): boolean {
+  return /^(lightning:)?(lnbc|lntb)[0-9a-z]+$/i.test(token)
+}

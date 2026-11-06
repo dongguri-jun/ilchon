@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Lang } from '../../contracts'
+import type { Lang, Settings } from '../../contracts'
 import { actions, useIlchon } from '../../engine/browser'
 import { useT } from '../../i18n'
 import {
@@ -14,7 +14,6 @@ import {
   IconTrash,
   IconWarning,
   Segmented,
-  Switch,
   useToast,
 } from '../../ui'
 import { BackupPanel } from '../lock/BackupPanel'
@@ -106,16 +105,15 @@ export function SettingsScreen() {
               />
             </div>
             <div className="settings__divider" />
-            <div className="settings__toggle">
-              <div className="ui-grow">
-                <div className="t-body1">{t('demoMode')}</div>
-                <div className="t-caption t-dim">{t('demoModeHelp')}</div>
-              </div>
-              <Switch
-                checked={settings.demoMode}
-                onChange={(demoMode) => void actions.setSettings({ demoMode })}
-                label={t('demoMode')}
+            <div className="settings__field">
+              <span className="t-body2 t-dim">{t('matchInterval')}</span>
+              <Segmented<Settings['matchInterval']>
+                options={(['live', '10s', '1m', '1h', '24h'] as const).map((value) => ({ value, label: t(`interval_${value}`) }))}
+                value={settings.matchInterval}
+                onChange={(matchInterval) => void actions.setSettings({ matchInterval })}
+                ariaLabel={t('matchInterval')}
               />
+              <div className="t-caption t-dim">{t('matchIntervalHelp')}</div>
             </div>
           </Card>
         </section>

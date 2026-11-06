@@ -181,7 +181,7 @@ async function main(): Promise<void> {
   // One match round per contact per window, in either role. The scenario re-matches
   // the same pairs within minutes, so it runs with the 8 s demo window; the
   // engines defer a blocked round until the window passed.
-  await Promise.all(peers.map((p) => p.engine.actions.setSettings({ demoMode: true })))
+  await Promise.all(peers.map((p) => p.engine.actions.setSettings({ matchInterval: '10s' })))
 
   // ---- connect: one pair per path
   const ab = await connectPair(A, B, 'inviter-first')

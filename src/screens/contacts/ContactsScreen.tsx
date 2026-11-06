@@ -20,6 +20,8 @@ import {
   useToast,
 } from '../../ui'
 import { NS } from './strings'
+import { readLinkedProfile } from '../../lib/nostr-profile'
+import { NostrProfileSection, ProfileAvatar } from './NostrProfile'
 import './contacts.css'
 
 export interface ContactsScreenProps {
@@ -42,6 +44,7 @@ export function ContactsScreen({ onOpenConnect, onOpenRoom }: ContactsScreenProp
   const [selectedId, setSelectedId] = useState<PubkeyHex | null>(null)
   const [name, setName] = useState('')
   const [saving, setSaving] = useState(false)
+  const [, refreshProfiles] = useState(0)
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   const matchedIds = useMemo(() => new Set(matches.map((m) => m.contactId)), [matches])
@@ -133,22 +136,29 @@ export function ContactsScreen({ onOpenConnect, onOpenRoom }: ContactsScreenProp
           <>
             <p className="contacts__intro t-body2 t-dim">{t('intro')}</p>
             <div className="contacts__list">
-              {sorted.map((c, i) => (
-                <ListRow
-                  key={c.id}
-                  leading={<Avatar seed={c.pubkey} name={c.name || undefined} size={44} />}
-                  title={
-                    c.name ? c.name : <span className="contacts__noname">{t('addName')}</span>
-                  }
-                  subtitle={<span className="num">{shortKey(c.pubkey)}</span>}
-                  trailing={
-                    matchedIds.has(c.id) ? <Badge tone="primary">{t('matched')}</Badge> : undefined
-                  }
-                  chevron
-                  divider={i < sorted.length - 1}
-                  onClick={() => openSheet(c)}
-                />
-              ))}
+              {sorted.map((c, i) => {
+                const profile = readLinkedProfile(c.id)
+                return (
+                  <ListRow
+                    key={c.id}
+                    leading={<ProfileAvatar profile={profile} seed={c.pubkey} name={c.name || undefined} size={44} />}
+                    title={
+                      c.name ? c.name : <span className="contacts__noname">{t('addName')}</span>
+                    }
+                    subtitle={<span className="contacts__profile-subtitle">
+                      {profile && <span className="t-truncate">{profile.display_name || profile.name || t('nostrUnnamed')}</span>}
+                      {profile?.nip05Verified && <Badge tone="primary">{t('nostrVerified')}</Badge>}
+                      {!profile && <span className="num">{shortKey(c.pubkey)}</span>}
+                    </span>}
+                    trailing={
+                      matchedIds.has(c.id) ? <Badge tone="primary">{t('matched')}</Badge> : undefined
+                    }
+                    chevron
+                    divider={i < sorted.length - 1}
+                    onClick={() => openSheet(c)}
+                  />
+                )
+              })}
             </div>
             <div className="contacts__cta">
               <Button fullWidth size="lg" leading={<IconPlus size={20} />} onClick={onOpenConnect}>
@@ -192,6 +202,13 @@ export function ContactsScreen({ onOpenConnect, onOpenRoom }: ContactsScreenProp
             >
               {t('save')}
             </Button>
+
+            <NostrProfileSection
+              key={selected.id}
+              contactId={selected.id}
+              linked={readLinkedProfile(selected.id)}
+              onChange={() => refreshProfiles((n) => n + 1)}
+            />
 
             <div className="contacts-sheet__actions">
               <Button fullWidth size="lg" leading={<IconSend size={20} />} onClick={openRoom}>

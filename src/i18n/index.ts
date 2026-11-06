@@ -9,6 +9,12 @@ const listeners = new Set<() => void>()
 
 function initialLang(): Lang {
   try {
+    const saved = localStorage.getItem('ilchon:lang')
+    if (saved === 'ko' || saved === 'en') return saved
+  } catch {
+    // Storage may be unavailable; fall back to the browser language.
+  }
+  try {
     if (typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('ko')) return 'ko'
   } catch {
     // ignore
@@ -17,6 +23,7 @@ function initialLang(): Lang {
 }
 
 let current: Lang = initialLang()
+if (typeof document !== 'undefined') document.documentElement.lang = current
 // Bumped on every registration so useT re-renders when strings arrive late.
 let version = 0
 
@@ -35,6 +42,12 @@ export function getLang(): Lang {
 }
 
 export function setLang(lang: Lang): void {
+  try {
+    localStorage.setItem('ilchon:lang', lang)
+  } catch {
+    // Switching still works when storage is unavailable.
+  }
+  if (typeof document !== 'undefined') document.documentElement.lang = lang
   if (lang === current) return
   current = lang
   emit()

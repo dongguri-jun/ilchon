@@ -6,8 +6,13 @@ registerStrings('settings', {
 
     secGeneral: '일반',
     language: '언어',
-    demoMode: '시연 모드',
-    demoModeHelp: '일촌 한 명당 매칭 응답을 24시간에 한 번이 아니라 8초에 한 번 해요.',
+    matchInterval: '맞춰보기 간격',
+    interval_live: '실시간',
+    interval_10s: '10초',
+    interval_1m: '1분',
+    interval_1h: '1시간',
+    interval_24h: '24시간',
+    matchIntervalHelp: '실시간이 기본이에요(해커톤 버전). 간격이 짧으면 조건을 바꿀 때 바로 다시 맞춰보지만, 일촌이 방향을 떠볼 수 있는 기회도 많아져요. 24시간이 가장 안전해요.',
 
     secRelays: '릴레이 연결',
     relayOn: '연결됨',
@@ -70,8 +75,13 @@ registerStrings('settings', {
 
     secGeneral: 'General',
     language: 'Language',
-    demoMode: 'Demo mode',
-    demoModeHelp: 'Answers one match round per contact every 8 s instead of once per 24 h.',
+    matchInterval: 'Matching interval',
+    interval_live: 'Live',
+    interval_10s: '10 s',
+    interval_1m: '1 min',
+    interval_1h: '1 hour',
+    interval_24h: '24 hours',
+    matchIntervalHelp: 'Live is the default in this hackathon build. Shorter intervals re-match right after you change your terms, but give contacts more chances to probe your trading direction. 24 hours is safest.',
 
     secRelays: 'Relay connections',
     relayOn: 'Connected',

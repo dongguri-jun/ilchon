@@ -163,7 +163,7 @@ if (typeof document !== 'undefined') {
   })
 }
 
-/** `?demo=1` turns demo mode on for this profile (stage devices), `?demo=0` off. */
+/** Legacy URL override: `?demo=1` selects 10 seconds, `?demo=0` selects 24 hours. */
 function demoFlag(): boolean | undefined {
   try {
     const v = new URLSearchParams(location.search).get('demo')
@@ -179,8 +179,9 @@ export function bootEngine(): Promise<void> {
     .start()
     .then(async () => {
       const demo = demoFlag()
-      if (demo !== undefined && engine.store.getState().settings.demoMode !== demo) {
-        await actions.setSettings({ demoMode: demo })
+      const matchInterval = demo === undefined ? undefined : demo ? 'live' : '24h'
+      if (matchInterval !== undefined && engine.store.getState().settings.matchInterval !== matchInterval) {
+        await actions.setSettings({ matchInterval })
       }
     })
     .catch(() => {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { ChatMessage, Currency, Side } from '../../contracts'
+import type { ChatMessage, Currency } from '../../contracts'
 import { actions, useIlchon } from '../../engine/browser'
 import { useT } from '../../i18n'
 import {
@@ -11,6 +11,7 @@ import {
   EmptyState,
   IconButton,
   IconCopy,
+  IconCheck,
   IconLock,
   IconSend,
   TextField,
@@ -24,6 +25,7 @@ import {
   formatMoney,
   formatSats,
   isLightningToken,
+  isInvoiceToken,
   parseAmountInput,
   sanitizeAmountInput,
   satsFor,
@@ -60,9 +62,24 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
   const tradable = myOffer && theirOffer ? Math.min(myOffer.amount, theirOffer.amount) : null
 
   const [summaryOpen, setSummaryOpen] = useState(true)
+  const composerRef = useRef<HTMLInputElement>(null)
+  const [completedAt, setCompletedAt] = useState(0)
+  const invoiceShared = messages.some((m) =>
+    m.kind === 'text' && m.at > Math.max(completedAt, match?.matchedAt ?? Infinity) &&
+    m.mine === (myOffer?.side === 'buy') &&
+    m.status !== 'failed' && m.status !== 'sending' &&
+    m.text.split(/\s+/).some(isInvoiceToken),
+  )
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const [doneOpen, setDoneOpen] = useState(false)
+
+  useEffect(() => {
+    setCompletedAt(0)
+    setSummaryOpen(true)
+    setDraft('')
+    setDoneOpen(false)
+  }, [contactId])
 
   const endRef = useRef<HTMLDivElement>(null)
   const lastId = messages.length > 0 ? messages[messages.length - 1].id : ''
@@ -80,6 +97,7 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
   }
 
   async function paste() {
+    composerRef.current?.focus()
     try {
       const text = (await navigator.clipboard.readText()).trim()
       if (!text) {
@@ -117,54 +135,53 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
         right={
           myOffer ? (
             <Button size="sm" variant="secondary" onClick={() => setDoneOpen(true)}>
-              {t('markDone')}
+              <span className="room__done-label">{t('markDone')}<small>{t('doneConsequence')}</small></span>
             </Button>
           ) : undefined
         }
       />
 
       <div className="room__summary">
-        {myOffer && theirOffer && tradable !== null ? (
-          <Card padding="sm">
-            <button
-              type="button"
-              className="room__summary-head"
-              aria-expanded={summaryOpen}
-              aria-label={t('summaryToggle')}
-              onClick={() => setSummaryOpen((o) => !o)}
-            >
-              <span className="t-caption t-dim">{t('tradable')}</span>
-              <span className="num t-bold room__summary-amount">{formatMoney(tradable, myOffer.currency)}</span>
-              <span className={cx('room__caret', summaryOpen && 'room__caret--open')} aria-hidden="true" />
-            </button>
-            {summaryOpen && (
-              <div className="room__summary-body">
-                <OfferLine
-                  who={t('me')}
-                  side={myOffer.side}
-                  amount={myOffer.amount}
-                  feePct={myOffer.feePct}
-                  currency={myOffer.currency}
-                />
-                <OfferLine
-                  who={name}
-                  side={theirOffer.side}
-                  amount={theirOffer.amount}
-                  feePct={theirOffer.feePct}
-                  currency={theirOffer.currency}
-                />
-                <SatsBlock
-                  tradable={tradable}
-                  rate={rates[myOffer.currency]}
-                  myFee={myOffer.feePct}
-                  theirFee={theirOffer.feePct}
-                />
-              </div>
-            )}
-          </Card>
-        ) : (
-          <p className="room__unmatched t-caption t-dim">{t('notMatched')}</p>
-        )}
+        <Card padding="sm">
+          <button type="button" className="room__summary-head"
+            aria-expanded={summaryOpen} aria-controls="room-next-steps"
+            onClick={() => setSummaryOpen((o) => !o)}>
+            <span className="room__guide-heading"><strong>{t('nextSteps')}</strong>
+              <span className="t-caption t-dim">{t(myOffer ? myOffer.side === 'buy' ? 'buyRole' : 'sellRole' : 'neutralRole', { currency: myOffer ? t(myOffer.currency) : '' })}</span>
+            </span>
+            <span className={cx('room__caret', summaryOpen && 'room__caret--open')} aria-hidden="true" />
+          </button>
+          {summaryOpen && <div id="room-next-steps" className="room__guide-body">
+            {completedAt > 0 && <p className="room__guide-note" role="status">{t(myOffer ? 'partialDone' : 'allDone')}</p>}
+            {!myOffer ? <p className="room__guide-note">{t('neutralHint')}</p> : <>
+              {!theirOffer && <p className="room__guide-note">{t('notMatched')}</p>}
+              <ol className="room__steps">
+                <li><span className="room__step-number" aria-hidden="true">1</span><div>
+                  <strong>{t('agreeStep')}</strong>
+                  {theirOffer && tradable !== null ? <div className="room__terms">
+                    <div className="room__sats-row"><span>{t('tradable')}</span><strong className="num">{formatMoney(tradable, myOffer.currency)}</strong></div>
+                    <p className="room__guide-note">{t('smallerAmount')}</p>
+                    <SatsBlock tradable={tradable} rate={rates[myOffer.currency]} myFee={myOffer.feePct} theirFee={theirOffer.feePct} />
+                  </div> : <p className="room__guide-note">{t('agreeAgain')}</p>}
+                </div></li>
+                {myOffer.side === 'buy' ? <>
+                  <li><StepNumber number={2} checked={invoiceShared} /><div><strong>{t('buyInvoice')}</strong>
+                    {invoiceShared && <p className="room__guide-note">{t('invoiceShared')}</p>}
+                    <Button size="sm" variant="secondary" onClick={() => void paste()}>{t('pasteInvoice')}</Button>
+                  </div></li>
+                  <li><StepNumber number={3} /><div><strong>{t('buyTransfer', { currency: t(myOffer.currency) })}</strong><p className="room__guide-note">{t('askAccount')}</p></div></li>
+                  <li><StepNumber number={4} /><div><strong>{t('buyDone')}</strong></div></li>
+                </> : <>
+                  <li><StepNumber number={2} /><div><strong>{t('sellAccount')}</strong><Button size="sm" variant="secondary" onClick={() => composerRef.current?.focus()}>{t('writeAccount')}</Button></div></li>
+                  <li><StepNumber number={3} /><div><strong>{t('sellVerify')}</strong><p className="room__guide-note">{t('verifyName')}</p></div></li>
+                  <li><StepNumber number={4} /><div><strong>{t('sellPay')}</strong><p className="room__guide-note">{t(invoiceShared ? 'invoiceReceived' : 'invoiceWait')}</p></div></li>
+                  <li><StepNumber number={5} /><div><strong>{t('sellDone')}</strong></div></li>
+                </>}
+              </ol>
+              <p className="room__guide-note">{t('manualChecks')}</p>
+            </>}
+          </div>}
+        </Card>
       </div>
 
       <div className="room__messages" role="log" aria-live="polite">
@@ -184,6 +201,8 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
         </div>
         <div className="room__input-row">
           <TextField
+            inputRef={composerRef}
+            label={t('inputPlaceholder')}
             className="room__input"
             value={draft}
             onChange={setDraft}
@@ -214,22 +233,18 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
           currency={myOffer.currency}
           myOpenAmount={myOffer.amount}
           suggested={tradable ?? myOffer.amount}
+          onCompleted={() => setCompletedAt(Date.now())}
         />
       )}
     </div>
   )
 }
 
-function OfferLine(props: { who: string; side: Side; amount: number; feePct: number; currency: Currency }) {
+function StepNumber({ number, checked = false }: { number: number; checked?: boolean }) {
   const t = useT(ROOM_NS)
-  return (
-    <div className="room__line">
-      <span className="room__who t-truncate">{props.who}</span>
-      <span className={cx('room__side', `room__side--${props.side}`)}>{t(props.side)}</span>
-      <span className="num room__line-amount">{formatMoney(props.amount, props.currency)}</span>
-      <span className="num t-dim room__line-fee">{formatFee(props.feePct)}</span>
-    </div>
-  )
+  return <span className={cx('room__step-number', checked && 'room__step-number--checked')}>
+    {checked ? <><IconCheck size={14} /><span className="sr-only">{t('invoiceShared')}</span></> : number}
+  </span>
 }
 
 function SatsBlock(props: { tradable: number; rate: number | undefined; myFee: number; theirFee: number }) {
@@ -257,11 +272,12 @@ function SatsBlock(props: { tradable: number; rate: number | undefined; myFee: n
 }
 
 function SatsRow({ label, sats }: { label: string; sats: number }) {
+  const t = useT(ROOM_NS)
   return (
     <div className="room__sats-row">
       <span className="t-caption t-dim">{label}</span>
       <span className="num">
-        {formatSats(sats)} <span className="t-caption t-dim">sats</span>
+        {formatSats(sats)} <span className="t-caption t-dim">{t('satsUnit')}</span>
       </span>
     </div>
   )
@@ -343,6 +359,7 @@ function DoneSheet(props: {
   currency: Currency
   myOpenAmount: number
   suggested: number
+  onCompleted: () => void
 }) {
   const { open, onClose, contactId, name, currency, myOpenAmount, suggested } = props
   const t = useT(ROOM_NS)
@@ -373,6 +390,7 @@ function DoneSheet(props: {
     setBusy(true)
     try {
       await actions.markDone(contactId, amount)
+      props.onCompleted()
       toast.show(t('doneOk'), 'success')
       onClose()
     } catch {

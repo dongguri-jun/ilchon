@@ -10,6 +10,9 @@
 }
 
 .shell-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
   flex: 0 0 auto;
   padding: calc(var(--safe-t) + var(--sp-4)) calc(var(--sp-12) + var(--safe-r)) var(--sp-4)
     calc(var(--sp-12) + var(--safe-l));
@@ -18,12 +21,38 @@
   text-align: center;
 }
 .shell-banner__text {
+  flex: 1;
+  min-width: 0;
   display: block;
   overflow: hidden;
   font-size: var(--fs-12);
   line-height: var(--lh-body);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.shell-banner__languages {
+  display: flex;
+  flex-shrink: 0;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+}
+.shell-banner__languages button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--sp-12);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--c-text-dim);
+  font: inherit;
+  font-size: var(--fs-12);
+  cursor: pointer;
+}
+.shell-banner__languages button[aria-pressed='true'] {
+  background: var(--c-warning-soft);
+  color: var(--c-text);
+  font-weight: var(--fw-bold);
 }
 
 .shell__stage {

@@ -165,16 +165,20 @@ export function OfferSheet({ open, onClose, editing }: OfferSheetProps) {
     >
       <div className="offer-form">
         <div className="offer-form__pair">
-          <Segmented<Side>
-            ariaLabel={t('sideLabel')}
-            value={side}
-            onChange={setSide}
-            disabled={busy}
-            options={[
-              { value: 'buy', label: t('sideBuy') },
-              { value: 'sell', label: t('sideSell') },
-            ]}
-          />
+          <div className="offer-form__sides" role="group" aria-label={t('sideLabel')}>
+            {(['buy', 'sell'] as const).map((choice) => (
+              <Button
+                key={choice}
+                variant={side === choice ? 'primary' : 'secondary'}
+                fullWidth
+                aria-pressed={side === choice}
+                onClick={() => setSide(choice)}
+                disabled={busy}
+              >
+                {t(choice === 'buy' ? 'sideBuy' : 'sideSell', { currency: t(currency === 'KRW' ? 'curKRW' : 'curUSD') })}
+              </Button>
+            ))}
+          </div>
           <Segmented<Currency>
             ariaLabel={t('currencyLabel')}
             value={currency}
@@ -186,6 +190,8 @@ export function OfferSheet({ open, onClose, editing }: OfferSheetProps) {
             ]}
           />
         </div>
+
+        {base && !resetsMatches && <p className="offer-form__edit-hint">{t('matchesKept')}</p>}
 
         {resetsMatches && (
           <p className="offer-form__warn" role="status">
@@ -262,7 +268,7 @@ export function OfferSheet({ open, onClose, editing }: OfferSheetProps) {
           {preview ? (
             <>
               <p className="offer-form__preview-main">{preview}</p>
-              {previewSats && <p className="offer-form__preview-sub num">{previewSats}</p>}
+              <p className="offer-form__preview-sub num">{previewSats ?? t('ratesUnavailable')}</p>
             </>
           ) : (
             <p className="offer-form__preview-main">{t('previewEmpty')}</p>

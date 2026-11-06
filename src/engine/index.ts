@@ -14,8 +14,7 @@ import { createStore, type StoreApi } from 'zustand/vanilla'
 import {
   CODE_DISPLAY_MS,
   CODE_REDEEM_MS,
-  RESPOND_WINDOW_DEMO_MS,
-  RESPOND_WINDOW_MS,
+  MATCH_INTERVAL_MS,
   type ChatMessage,
   type ConnectState,
   type Contact,
@@ -64,8 +63,6 @@ const ABANDONED_CAP = 200
 const RESP_SESSION_TTL_MS = 10 * 60_000
 const CHAT_MAX = 2000
 const NAME_MAX = 40
-/** Demo mode only: how often a refused round is tried again once the window passed. */
-const MX_RETRIES = 2
 /** How long a reauth (or a fresh unlock/create) lets changeLock, exportBackup and exportKey run. */
 const REAUTH_MS = 5 * 60_000
 
@@ -225,6 +222,10 @@ function parsePublicOffer(v: unknown): PublicOffer | null {
   }
 }
 
+function validMatchInterval(value: unknown): value is Settings['matchInterval'] {
+  return value === 'live' || value === '10s' || value === '1m' || value === '1h' || value === '24h'
+}
+
 // ---------------------------------------------------------------- engine
 
 export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonEngine {
@@ -244,8 +245,8 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     connect: { phase: 'idle' },
     rates: {},
     lock: { method: null, passkeySupported: null, backedUp: false, migrated: false },
-    // Demo mode weakens the one-round-per-day limit, so it is opt-in (Settings or ?demo=1).
-    settings: { lang: hooks.defaultLang ?? 'ko', sort: 'amount', demoMode: false },
+    // New hackathon profiles start with a short, user-selectable interval.
+    settings: { lang: hooks.defaultLang ?? 'ko', sort: 'amount', matchInterval: 'live', demoMode: false },
   }))
   const get = store.getState
   const set = (patch: Partial<IlchonState>) => store.setState(patch)
@@ -403,6 +404,10 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       }
     }
     const settings = await kv.get<Partial<Settings>>('settings')
+    const existingProfile = settings != null || (await kv.get('vault')) != null ||
+      (await kv.get('sk')) != null || (await kv.get('pubkey')) != null
+    const matchInterval = validMatchInterval(settings?.matchInterval) ? settings.matchInterval :
+      settings?.demoMode === true || !existingProfile ? 'live' : '24h'
 
     mem.tombstones = (await kv.get<Record<PubkeyHex, Tombstone>>('tombstones')) ?? {}
     mem.verified = (await kv.get<Record<PubkeyHex, string>>('verified')) ?? {}
@@ -450,8 +455,9 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       matches,
       matchProgress: progress,
       rooms,
-      settings: { ...get().settings, ...settings },
+      settings: { ...get().settings, ...settings, matchInterval },
     })
+    await save('settings')
   }
 
   function remember(id: string): void {
@@ -1059,9 +1065,6 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
 
   // ============================================================== 4. matching
 
-  /** contact -> repeats used for the current offer after a refusal (demo mode). */
-  const mxRetries = new Map<PubkeyHex, number>()
-
   /**
    * Which contacts matchProgress counted for the current offer, so a deleted
    * contact can be taken out again. Memory only: after a reload it is rebuilt
@@ -1077,8 +1080,18 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   }
 
   function bump(field: 'asked' | 'answered', contactId: PubkeyHex): void {
+    const previous = progressOf.get(contactId)
+    if (previous === 'answered' || (field === 'asked' && previous !== undefined)) return
     const p = get().matchProgress
-    set({ matchProgress: { ...p, [field]: p[field] + 1 } })
+    // A restored offer can already have finished counts without a memory map.
+    if (field === 'answered' && !progressKnown && previous === undefined && p.answered >= p.asked) return
+    set({
+      matchProgress: {
+        ...p,
+        [field]: p[field] + 1,
+        ...(field === 'answered' && previous === undefined && progressKnown ? { asked: p.asked + 1 } : {}),
+      },
+    })
     progressOf.set(contactId, field)
     void save('progress')
   }
@@ -1122,11 +1135,14 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     for (const id of deferTimers.values()) cancel(id)
     deferTimers.clear()
     void save('deferred')
-    mxRetries.clear()
+  }
+
+  function isShortInterval(): boolean {
+    return get().settings.matchInterval === 'live' || get().settings.matchInterval === '10s' || get().settings.matchInterval === '1m'
   }
 
   function roundWindow(): number {
-    return get().settings.demoMode ? RESPOND_WINDOW_DEMO_MS : RESPOND_WINDOW_MS
+    return MATCH_INTERVAL_MS[get().settings.matchInterval]
   }
 
   /** When the shared round budget with `pk` frees up; 0 when it is free now. */
@@ -1188,7 +1204,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   /** Start this round once the window passed. Kept across reloads (see armDeferred). */
   function armDeferred(pk: PubkeyHex, d: DeferredRound, at: number): void {
     // Let the peer's window (spent a moment after mine) expire too.
-    const DEFER_SLACK_MS = get().settings.demoMode ? 2_000 : 5_000
+    const DEFER_SLACK_MS = get().settings.matchInterval === 'live' ? 300 : get().settings.matchInterval === '10s' ? 2_000 : 5_000
     cancel(deferTimers.get(pk))
     deferTimers.set(
       pk,
@@ -1211,6 +1227,10 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       const offer = get().myOffer
       const c = contactOf(contactId)
       if (!offer || offer.id !== offerId || !c) return
+      if (retry && mem.verified[contactId] === offerId && get().matches.some((m) => m.contactId === contactId)) return
+      // A pending initiator is a reservation even after its cooldown expires.
+      // Do not overwrite its owner while a late m2 can still complete it.
+      if (Object.values(mem.init).some((s) => s.contactId === contactId)) return
       const freeAt = budgetFreeAt(contactId)
       if (freeAt) {
         // I already used a round with this contact in the window (either role).
@@ -1239,11 +1259,21 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       }
       if (get().myOffer?.id !== offerId || mem.init[sid] !== session) return
       if (!retry && !asked) bump('asked', contactId)
-      later(90_000, () => {
+      const deadline = isShortInterval() ? roundWindow() : 90_000
+      const expire = (): void => {
         void enqueue(contactId, async () => {
-          if (mem.init[sid] === session) recoverInit(contactId, sid)
+          if (mem.init[sid] !== session) return
+          // An explicit send failure already has bounded outbox retries. Do
+          // not invalidate them before exhaustion; this deadline recovers
+          // silently lost m1/m2, for which there is no outbox retry.
+          if (outbox.get(c.groupId)?.items.some((it) => it.msg.t === 'm1' && it.msg.sid === sid)) {
+            later(deadline, expire)
+            return
+          }
+          recoverInit(contactId, sid)
         })
-      })
+      }
+      later(deadline, expire)
       await send(c.groupId, { t: 'm1', sid, p }, { peer: contactId })
     })
   }
@@ -1258,11 +1288,11 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
 
     const t = now()
     let yielded: InitSession | undefined
-    if (budgetFreeAt(from)) {
+    const owner = mem.roundOwner[from]
+    const mine = owner?.startsWith('i:') ? mem.init[owner.slice(2)] : undefined
+    if (budgetFreeAt(from) || mine) {
       // A round with this contact holds the window. Only one case is not a
       // refusal: we both started a round at once and mine has not been answered.
-      const owner = mem.roundOwner[from]
-      const mine = owner?.startsWith('i:') ? mem.init[owner.slice(2)] : undefined
       if (!mine || mine.contactId !== from) {
         await send(m.groupId, { t: 'mx', sid: msg.sid }, { peer: from })
         return
@@ -1284,9 +1314,8 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     // Answer only once the spent budget is stored, or a reload would let the peer ask again.
     if (!(await spendBudget(from, `r:${msg.sid}`))) return
     if (yielded && get().myOffer?.id === yielded.offerId) {
-      // This answer already compares my current offer with the peer's, so count
-      // the contact as answered; my own round runs once the window passed.
-      if (!yielded.retry) bump('answered', from)
+      // The winning round compares my current offer too. Count it only when
+      // m3 completes; keep recovery queued in case that message is lost.
       const d: DeferredRound = { offerId: yielded.offerId, retry: true }
       mem.deferred[from] = d
       void save('deferred')
@@ -1325,7 +1354,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     const offer = get().myOffer
     // My offer changed since round 1: the answer no longer means anything.
     if (!c || !offer || offer.id !== s.offerId) return
-    if (!s.retry) bump('answered', from)
+    bump('answered', from)
     // Completing a round spends the budget with this contact again, from now.
     if (!(await spendBudget(from, `i:${msg.sid}`))) return
 
@@ -1368,6 +1397,10 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     } catch {
       matched = false
     }
+    // Keep the cooldown from completion too: a delayed m3 must not allow a
+    // second completed probe immediately after this one.
+    if (!(await spendBudget(from, `r:${msg.sid}`))) return
+    if (s.offerId !== null && get().myOffer?.id === s.offerId) bump('answered', from)
     // Nothing is kept about a round that did not match.
     if (!matched) return
     const c = activeContact(from, m.groupId)
@@ -1390,19 +1423,12 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     releaseInit(from, msg.sid)
     const offer = get().myOffer
     if (!offer || offer.id !== s.offerId) return
-    if (!s.retry) bump('answered', from)
-
-    // Demo mode: the peer's window is short, so ask once more after it passed.
-    // Without this a re-posted offer in a live demo would silently find nobody.
-    if (!get().settings.demoMode) return
-    const used = mxRetries.get(from) ?? 0
-    if (used >= MX_RETRIES) return
-    mxRetries.set(from, used + 1)
-    const offerId = offer.id
-    later(RESPOND_WINDOW_DEMO_MS + 1500, () => {
-      if (get().myOffer?.id !== offerId || mem.verified[from] !== undefined) return
-      startRound(from, offerId, true)
-    })
+    // A refusal is not an answered probe. Keep one persisted retry for this
+    // offer until the peer can answer; a fixed retry cap can strand it forever.
+    const d: DeferredRound = { offerId: offer.id, retry: true }
+    mem.deferred[from] = d
+    void save('deferred')
+    armDeferred(from, d, now() + roundWindow())
   }
 
   function onOffer(m: IncomingMessage, msg: Wire<'offer'>): void {
@@ -1609,7 +1635,6 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     cancel(deferTimers.get(id))
     deferTimers.delete(id)
     delete mem.confirms[id]
-    mxRetries.delete(id)
     const rooms = { ...get().rooms }
     delete rooms[id]
     set({
@@ -1636,10 +1661,14 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       settings: {
         lang: patch.lang === 'ko' || patch.lang === 'en' ? patch.lang : cur.lang,
         sort: patch.sort === 'amount' || patch.sort === 'fee' ? patch.sort : cur.sort,
+        matchInterval: validMatchInterval(patch.matchInterval) ? patch.matchInterval : cur.matchInterval,
         demoMode: typeof patch.demoMode === 'boolean' ? patch.demoMode : cur.demoMode,
       },
     })
     await save('settings')
+    if (cur.matchInterval !== get().settings.matchInterval) {
+      for (const [pk, d] of Object.entries(mem.deferred)) armDeferred(pk, d, budgetFreeAt(pk) || now())
+    }
   }
 
   function exportKey(): string {

@@ -2,7 +2,7 @@
 
 **Trade bitcoin only with people you have met, and show your offer only to the ones who would take the other side.**
 
-Live demo: https://ilchon.dongguri.org (hackathon demo build, not for real money)
+Live demo: https://ilchon.org (hackathon demo build, not for real money)
 
 Built at **bitcoin++ Seoul 2026** (privacy edition).
 
@@ -46,7 +46,7 @@ The comparison uses commutative blinding over **ristretto255** with fresh secret
 2. `m2` responder → initiator: `q = H(label_r)^b` and `pq = SHA-256(p^b)` — a hash commitment, never the point itself, so the initiator cannot echo it back to fake a match
 3. `m3` initiator → responder: `qp = q^a`
 
-The initiator compares `SHA-256(q^a)` against `pq`; the responder compares `SHA-256(qp)` against the commitment it kept (hashes are domain-tagged, label fields length-prefixed, points rejected if malformed or identity). Blinding commutes, so equal labels give equal values, and neither side learns the other's label. Only after both sides verify a match does each send its `offer` (amount and premium). A responder answers one round per contact per 24 hours (8 s in demo mode).
+The initiator compares `SHA-256(q^a)` against `pq`; the responder compares `SHA-256(qp)` against the commitment it kept (hashes are domain-tagged, label fields length-prefixed, points rejected if malformed or identity). Blinding commutes, so equal labels give equal values, and neither side learns the other's label. Only after both sides verify a match does each send its `offer` (amount and premium). Each contact gets at most one completed matching round per interval. Settings → **맞춰보기 간격** replaces demo mode, with **실시간 / 10초 / 1분 / 1시간 / 24시간** (Live / 10 s / 1 min / 1 h / 24 h). New profiles default to Live (near real time) in this hackathon build. Shorter intervals allow faster re-matching but give a contact more chances to probe your side; 24 h is the safest.
 
 Code: `src/lib/match/`, wire format in `src/contracts.ts`.
 
@@ -58,6 +58,13 @@ Code: `src/lib/match/`, wire format in `src/contracts.ts`.
 - Knowing someone's pubkey is never enough to become their contact.
 - On a laptop without a camera, "Copy code" and paste work the same way.
 
+## On-device profile and trade guidance
+
+- **KO/EN** on the top banner switches language on every screen, including first-run setup and unlock.
+- Optionally paste an npub for an existing contact made by mutual QR. ilchon fetches the public kind-0 profile (name, picture and NIP-05 check) from public relays and shows it on your device only. It is not sent to the contact or published, and does not prove that the npub belongs to that person.
+- Your board offer has a status badge: **registered · checking n/m · no match · n matches**, labelled **수정/내리기** (edit/take down) buttons, and buyer/seller role hints.
+- The trade room has a role-specific **다음 할 일** (next steps) checklist. Buyer: agree price → send my Lightning invoice → bank-transfer fiat → mark done after sats arrive. Seller: agree → share bank account → confirm deposit and that the sender name matches → pay their invoice → mark done.
+
 ## Key lock
 
 The app makes its own Nostr key; it does not ask for your existing one. On setup you choose how to lock it:
@@ -66,7 +73,7 @@ The app makes its own Nostr key; it does not ask for your existing one. On setup
 - **Password:** the key is stored as a NIP-49 `ncryptsec`, compatible with other Nostr apps.
 - **No lock:** for stage demos only; the app warns before you choose it.
 
-You can export an `ncryptsec` backup and restore the same key on another profile. Password lock, backup and restore were checked on the deployed build. The passkey lock has not yet been tested on real iOS and Android devices. Marmot group state and contacts are not encrypted at rest in this version.
+You can export an `ncryptsec` backup and restore the same key on another profile. Password lock, backup and restore were checked on the deployed build. Tested on Galaxy S24 with Chrome: passkey lock creation and unlock worked with Google Password Manager, camera QR scanning of a laptop screen worked, and phone ↔ laptop linking worked across ilchon.org and ilchon.dongguri.org. Marmot group state and contacts are not encrypted at rest in this version.
 
 ## NIPs and specs used
 
@@ -118,7 +125,7 @@ Where ilchon is weaker, and we say so: no escrow or dispute resolution, no IP hi
 **Privacy**
 - Bank transfers leave records at the bank.
 - Posting "buy" reveals every selling contact to you, and you to them.
-- A determined contact can probe over several days by switching sides to learn your direction.
+- A determined contact can probe across matching intervals by switching sides to learn your direction; shorter intervals give more chances to probe, and 24 h is the safest.
 - The side that learns the result first could modify its app to send a false answer.
 - Matching starts when an offer is posted, so a non-matching contact can tell that you just posted something.
 - Relays see your IP address and connection times; colluding relays could infer who joins which group.
@@ -136,7 +143,7 @@ pnpm i
 pnpm dev
 ```
 
-Open several profiles in one browser with `?p=<name>`; each name has its own key and storage. `demo=1` shortens the one-round-per-day limit to 8 s:
+Open several profiles in one browser with `?p=<name>`; each name has its own key and storage. New profiles default to the Live matching interval in this hackathon build; `?demo=1` sets Live and `?demo=0` sets 24 h:
 
 ```
 http://localhost:5173/?p=a&demo=1

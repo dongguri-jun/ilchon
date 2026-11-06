@@ -2,13 +2,15 @@
 
 ## 무대 준비 (발표 전에 끝내 두기)
 
-노트북 한 대, 브라우저 하나에 탭 세 개를 열어요. 주소 뒤 `p=`가 사용자를 나누고, `demo=1`은 하루 한 번 제한을 8초로 줄여요.
+노트북 한 대, 브라우저 하나에 탭 세 개를 열어요. 주소 뒤 `p=`가 사용자를 나눠요. 새 프로필의 맞춰보기 간격은 이 해커톤 빌드에서 기본 **실시간**이에요. 발표용 프로필은 **기본값 그대로** 두세요. 설정 → **맞춰보기 간격**은 **실시간 / 10초 / 1분 / 1시간 / 24시간**이며 시연 모드를 대신해요. `?demo=1`은 실시간, `?demo=0`은 24시간으로 설정해요. 같은 일촌과는 간격마다 완료된 맞춰보기가 최대 한 번이에요. 짧으면 다시 빨리 맞춰보지만 상대가 내 방향을 떠볼 기회도 늘어나므로, 24시간이 가장 안전해요.
+
+해외 심사위원에게는 모든 화면 상단 배너의 **KO/EN** 전환을 보여 주세요. 첫 설정과 잠금 해제 화면에서도 쓸 수 있어요.
 
 | 탭 | 주소 | 역할 |
 |---|---|---|
-| A | https://ilchon.dongguri.org/?p=a&demo=1 | 나. 원화 10만 원어치 삽니다 +1% |
-| B | https://ilchon.dongguri.org/?p=b&demo=1 | 루이스. 원화 9만 원어치 팝니다 +3% |
-| C | https://ilchon.dongguri.org/?p=c&demo=1 | 마루. 원화 5만 원어치 삽니다 +1% |
+| A | https://ilchon.org/?p=a&demo=1 | 나. 원화 10만 원어치 삽니다 +1% |
+| B | https://ilchon.org/?p=b&demo=1 | 루이스. 원화 9만 원어치 팝니다 +3% |
+| C | https://ilchon.org/?p=c&demo=1 | 마루. 원화 5만 원어치 삽니다 +1% |
 
 1. 각 탭에서 **새로 시작하기** → **잠그지 않기** → **잠그지 않고 쓰기**. 백업 화면이 나오면 **나중에 할게요**.
 2. 연결은 A–B, A–C 두 쌍만 해요. B와 C는 서로 모르는 사이예요.
@@ -57,9 +59,9 @@ QR 코드는 30초마다 바뀌어요. 복사하고 바로 붙여넣어요.
   - 말: "마루 화면에는 아무것도 없어요. 마루는 제 방향, 통화, 금액, 수수료를 알 수 없어요. 맞춰보기가 시작된 것만 알 수 있어요."
 - B 탭: 맞은편 **삽니다** 칸에 나(10만 원, +1%).
   - 말: "맞춰보기는 ristretto255 위의 블라인딩으로 방향과 통화만 비교하고, 맞은 뒤에야 금액을 주고받아요."
-- **A의 매칭은 조건을 올리고 약 10초 뒤에 떠요.** 떠보기를 막으려고 같은 일촌과는 한 창(시연 모드 8초)에 한 번만 맞춰보는데, 루이스가 먼저 조건을 올릴 때 이미 A와 한 번 맞춰봤기 때문이에요. 그동안 "일촌 n명 중 n명 확인했어요" 표시를 가리키며 이 이유를 설명하면 시간이 자연스럽게 채워져요.
-  - 말: "같은 일촌과는 정해진 시간에 한 번만 맞춰봐요. 그래야 상대가 방향을 바꿔 가며 저를 떠볼 수 없어요."
-  - 기다리기 싫으면 순서를 바꿔요: **A가 맨 먼저** 조건을 올리고, 8초 이상 지난 뒤 루이스와 마루가 올리면 바로 떠요.
+- **기본 실시간 간격에서는 몇 초 안에 매칭이 나타나요.** (With the default Live interval the match shows up within a few seconds.)
+  - 내 조건의 상태 배지(등록됨 · 확인 중 n/m · 일치 없음 · n명 일치), **수정/내리기** 버튼, 구매자·판매자 역할 안내를 가리켜요.
+  - 말: "같은 일촌과는 설정한 간격마다 완료된 맞춰보기가 최대 한 번이에요. 간격이 짧으면 빨리 다시 확인하지만, 상대가 제 방향을 떠볼 기회도 많아져요. 24시간이 가장 안전해요."
 
 ### 2:40 — 방 열기와 거래 (50초)
 
@@ -68,13 +70,14 @@ QR 코드는 30초마다 바뀌어요. 복사하고 바로 붙여넣어요.
 2. A 탭: 사는 쪽이 받는 쪽이므로, 라이트닝 지갑에서 만든 청구서를 **청구서 붙여넣기**(또는 입력칸에 붙여넣기) → **보내기**
    - 말: "비트코인을 받는 제가 라이트닝 청구서를 보내고, 원화는 계좌이체로 보내요."
 3. B 탭: 같은 방에 청구서가 도착한 것을 보여 줘요.
+   - **다음 할 일** 체크리스트를 짚어요. 구매자: 가격 합의 → 내 라이트닝 청구서 보내기 → 법정화폐 계좌이체 → sats 도착 후 완료 표시. 판매자: 합의 → 계좌 공유 → 입금과 입금자 이름 일치 확인 → 상대 청구서 결제 → 완료 표시.
 4. A 탭: **거래 완료** → 거래한 금액 `90000` → **완료로 표시**
    - 말: "9만 원만큼 거래했고, 남은 1만 원 조건은 계속 열려 있어요."
 
 ### 3:30 — 마무리 (20초)
 
 - 말: "Marmot은 중계 서버에게서 내용을 숨기고, 몰래 맞춰보기는 거래하지 않을 일촌에게서 거래 의사를 숨겨요."
-- 말: "믿는 사람하고만 거래하고, 거래할 사람에게만 보여요. ilchon.dongguri.org에서 지금 휴대폰으로 써 보세요."
+- 말: "믿는 사람하고만 거래하고, 거래할 사람에게만 보여요. ilchon.org에서 지금 휴대폰으로 써 보세요."
 
 ## 중계 서버가 느릴 때
 
@@ -90,13 +93,22 @@ QR 코드는 30초마다 바뀌어요. 복사하고 바로 붙여넣어요.
 |---|---|
 | 이게 통장 정지를 정말 막아 주나요? | 막아 준다고 말하지 않아요. 모르는 사람과 거래해야 할 이유를 없애요. 입금자 이름이 상대 본인인지는 직접 확인해야 해요. |
 | 암호화 메신저에서 친구끼리 거래하는 것과 뭐가 다른가요? | 메신저에서는 올리면 방에 있는 전원이 봐요. 여기서는 거래가 성립하는 사람만 봐요. |
-| 방향이 사기와 팔기 둘뿐인데 정말 숨겨지나요? | 혼자 계산해서는 알아낼 수 없어요. 알아내려면 맞춰보기에 참여해야 하고, 그러면 본인도 드러나요. 한 일촌과는 하루 한 번만 맞춰봐요. 며칠에 걸쳐 방향을 바꿔 가며 떠보는 건 막지 못한다고 한계에 적어 두었어요. |
+| 방향이 사기와 팔기 둘뿐인데 정말 숨겨지나요? | 혼자 계산해서는 알아낼 수 없어요. 알아내려면 맞춰보기에 참여해야 하고, 그러면 본인도 드러나요. 같은 일촌과는 설정한 간격마다 완료된 맞춰보기가 최대 한 번이에요. 여러 간격에 걸쳐 방향을 바꿔 가며 떠보는 것은 막지 못해요. 짧을수록 떠볼 기회가 늘어나고 24시간이 가장 안전해요. |
 | 왜 Marmot이어야 하나요? | 서버가 없어야 거래 의사와 인맥이 모이는 곳이 없어요. 전화번호 없는 신원과 메시지마다 바뀌는 일회용 키를 그대로 써요. |
 | 시연이 실제 Marmot 위에서 도나요? | 네. 지금 보신 메시지는 실제 중계 서버(whitenoise relay)를 거친 Marmot 메시지예요. 대체 통신 경로는 두지 않았어요. |
 | Vexl과 뭐가 다른가요? | Vexl처럼 인맥 안에서만 거래해요. 다른 점은 셋이에요. 전화번호가 필요 없고, 인맥이 회사 서버가 아니라 내 기기에만 있고, 제안이 인맥 전원이 아니라 거래가 성립하는 사람에게만 보여요. |
 | Mostro, RoboSats, Hodl Hodl, Bisq와 뭐가 다른가요? | 그 서비스들은 낯선 사람끼리 공개 게시판에서 만나고 예치로 먹튀를 막아요. 여기는 게시판이 없고 아는 사람하고만 거래해요. 대신 예치와 분쟁 해결이 없어요. |
 | 결과를 먼저 아는 쪽이 거짓말하면요? | 가능해요. 한계로 적어 두었어요. 응답 쪽은 해시 커밋만 보내서, 받은 값을 되돌려 보내 가짜로 맞은 척하는 것은 막았어요. |
-| 키는 어디에 저장되나요? | 이 기기에만 있어요. 패스키 PRF로 만든 키나 NIP-49 비밀번호로 암호화하고, ncryptsec 백업으로 다른 기기에서 되살릴 수 있어요. 패스키 잠금은 실제 휴대폰에서 아직 검증하지 않았어요. |
+| 키는 어디에 저장되나요? | 이 기기에만 있어요. 패스키 PRF로 만든 키나 NIP-49 비밀번호로 암호화하고, ncryptsec 백업으로 다른 기기에서 되살릴 수 있어요. Galaxy S24의 Chrome에서 Google Password Manager로 패스키 잠금 생성과 해제를 테스트해 성공했어요. |
 | 중계 서버는 무엇을 보나요? | 암호문, 무작위 그룹 식별자, 시각, 접속 IP를 봐요. IP는 가리지 않아요. |
 | 폰을 바꾸면요? | 키는 ncryptsec 백업으로 되살릴 수 있지만, 일촌과 방은 아직 백업되지 않아 다시 QR을 찍어야 해요. |
 | 법적으로 괜찮나요? | 개인 간 가상자산 거래 도구의 법적 경계는 아직 확인하지 않았어요. 해커톤 시연판이고, 실제 거래는 본인 책임이라고 화면에 적어 두었어요. |
+
+## 추가 기능과 실기기 확인 / Additional features and device test
+
+- **선택적 공개 프로필 연결:** 서로 QR을 찍어 이미 연결한 일촌에게 npub을 붙여넣으면 공개 릴레이에서 공개 kind-0 프로필(이름, 사진, NIP-05 확인)을 가져와 내 기기에만 보여 줘요. 상대에게 보내거나 공개하지 않으며, 그 npub이 그 사람 것임을 증명하지 않아요.
+- **실기기 테스트 성공:** Galaxy S24, Chrome에서 Google Password Manager를 통한 패스키 잠금 생성·해제, 노트북 화면의 QR 카메라 스캔, ilchon.org와 ilchon.dongguri.org 간 휴대폰 ↔ 노트북 연결을 확인했어요.
+- **Presenter settings:** Leave profiles at the default Live interval. Settings → 맞춰보기 간격 replaces demo mode: Live / 10 s / 1 min / 1 h / 24 h. New profiles default to Live in this hackathon build; `?demo=1` sets Live, `?demo=0` sets 24 h. Each contact gets at most one completed matching round per interval. Shorter means faster re-matching but more chances to probe your side; 24 h is the safest. Show international judges the top-banner KO/EN toggle, available on every screen including first-run setup and unlock.
+- **Optional public profile link:** Paste an npub for an existing mutual-QR contact. ilchon fetches the public kind-0 profile (name, picture, NIP-05 check) from public relays for display on your device only. It is not sent to the contact or published and does not prove that the npub belongs to that person.
+- **Board and room:** Point out your offer's badge (registered · checking n/m · no match · n matches), labelled 수정/내리기 (edit/take down) buttons and buyer/seller role hints. The room's 다음 할 일 (next steps) checklist is role-specific. Buyer: agree price → send my Lightning invoice → bank-transfer fiat → mark done after sats arrive. Seller: agree → share bank account → confirm deposit and that the sender name matches → pay their invoice → mark done.
+- **Tested:** Galaxy S24, Chrome: passkey lock creation and unlock worked with Google Password Manager; camera QR scanning of a laptop screen worked; phone ↔ laptop linking worked across ilchon.org and ilchon.dongguri.org.

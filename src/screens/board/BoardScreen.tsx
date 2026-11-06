@@ -11,12 +11,9 @@ import {
   Chip,
   Dialog,
   EmptyState,
-  IconButton,
-  IconEdit,
   IconLock,
   IconPlus,
   IconQr,
-  IconTrash,
   cx,
   useToast,
 } from '../../ui'
@@ -60,6 +57,7 @@ export function BoardScreen({ onOpenRoom, onOpenConnect, intro }: BoardScreenPro
     [myOffer, matches, contacts, rates, sort],
   )
   const rateText = ratesList(rates)
+  const checking = contacts.length > 0 && (progress.asked === 0 || progress.asked > progress.answered)
 
   const setSort = (mode: SortMode) => {
     if (mode === sort) return
@@ -92,6 +90,7 @@ export function BoardScreen({ onOpenRoom, onOpenConnect, intro }: BoardScreenPro
           <span>{title}</span>
           {other && rows.length > 0 && <span className="board-col__count num">{rows.length}</span>}
         </h2>
+        {other && rows.length > 0 && <p className="board-col__hint">{t('openRoomHint')}</p>}
         <div className="board-col__body">
           {myOffer === null && (
             <div className="board-slot board-slot--locked" aria-hidden>
@@ -103,6 +102,7 @@ export function BoardScreen({ onOpenRoom, onOpenConnect, intro }: BoardScreenPro
               offer={own}
               busy={withdrawing}
               contactCount={contacts.length}
+              matchCount={rows.length}
               asked={progress.asked}
               answered={progress.answered}
               onEdit={() => setSheet('edit')}
@@ -122,8 +122,8 @@ export function BoardScreen({ onOpenRoom, onOpenConnect, intro }: BoardScreenPro
               ))
             ) : (
               <div className="board-slot board-slot--wait">
-                <p className="board-slot__title">{t('waitTitle')}</p>
-                <p className="board-slot__body">{t('waitBody')}</p>
+                <p className="board-slot__title">{t(contacts.length === 0 ? 'noContactsTitle' : checking ? 'checkingTitle' : 'waitTitle')}</p>
+                <p className="board-slot__body">{t(contacts.length === 0 ? 'noContacts' : checking ? 'checkingBody' : 'waitBody')}</p>
               </div>
             ))}
         </div>
@@ -137,7 +137,10 @@ export function BoardScreen({ onOpenRoom, onOpenConnect, intro }: BoardScreenPro
 
       <div className="ui-page ui-has-nav board__body">
         {intro}
-        {rateText && <p className="board__rates num">{t('rates', { list: rateText })}</p>}
+        <p className="board__rates num">{rateText ? t('rates', { list: rateText }) : t('ratesUnavailable')}</p>
+        {myOffer && rateText && !(Number.isFinite(rates[myOffer.currency]) && rates[myOffer.currency]! > 0) && (
+          <p className="board__rates">{t('ratesUnavailable')}</p>
+        )}
 
         <div className="board__sort" role="group" aria-label={t('sortLabel')}>
           <Chip selected={sort === 'amount'} onClick={() => setSort('amount')}>
@@ -153,8 +156,8 @@ export function BoardScreen({ onOpenRoom, onOpenConnect, intro }: BoardScreenPro
         {myOffer === null ? (
           <EmptyState
             icon={<IconLock size={28} />}
-            title={t('emptyTitle')}
-            body={t('emptyBody')}
+            title={t(contacts.length === 0 ? 'noContactsTitle' : 'emptyTitle')}
+            body={t(contacts.length === 0 ? 'emptyNoContacts' : 'emptyBody')}
             action={
               <div className="board__empty-actions">
                 <Button size="lg" fullWidth leading={<IconPlus size={20} />} onClick={() => setSheet('new')}>
@@ -196,6 +199,7 @@ interface MyOfferProps {
   offer: Offer
   busy: boolean
   contactCount: number
+  matchCount: number
   asked: number
   answered: number
   onEdit: () => void
@@ -203,22 +207,30 @@ interface MyOfferProps {
   onOpenConnect: () => void
 }
 
-function MyOffer({ offer, busy, contactCount, asked, answered, onEdit, onWithdraw, onOpenConnect }: MyOfferProps) {
+function MyOffer({ offer, busy, contactCount, matchCount, asked, answered, onEdit, onWithdraw, onOpenConnect }: MyOfferProps) {
   const t = useT(NS)
   const amount = formatMoney(offer.amount, offer.currency)
   const noContacts = contactCount === 0
 
-  let status: string
-  if (noContacts) status = t('noContacts')
-  else if (asked <= 0) status = t('progressStarting')
-  else if (answered >= asked) status = t(asked === 1 ? 'progressAllOne' : 'progressAll', { asked })
-  else status = t(asked === 1 ? 'progressOne' : 'progress', { asked, answered })
+  const checking = !noContacts && (asked === 0 || asked > answered)
+  const status = noContacts
+    ? t('statusNoContacts')
+    : checking
+      ? t('statusChecking', { answered, asked: asked || contactCount })
+      : matchCount > 0
+        ? t(matchCount === 1 ? 'statusMatchOne' : 'statusMatches', { count: matchCount })
+        : t('statusNoMatch')
 
   return (
     <>
       <Card tone="primary" padding="sm">
         <div className="board-mine">
-          <Badge tone="primary">{t('mine')}</Badge>
+          <span className="board-mine__label">{t('mine')}</span>
+          <div className="board-mine__status" role="status">
+            <Badge tone="primary" icon={checking ? <span className="board-mine__dot" aria-hidden="true" /> : undefined}>
+              {status}
+            </Badge>
+          </div>
           <div className={cx('board-mine__amount num', amountClass(amount))}>{amount}</div>
           <div className="board-mine__fee">
             {t('market')} <span className="num t-bold">{formatFee(offer.feePct)}</span>
@@ -227,27 +239,17 @@ function MyOffer({ offer, busy, contactCount, asked, answered, onEdit, onWithdra
             {t(offer.side === 'buy' ? 'colBuy' : 'colSell')} · {t(offer.currency === 'KRW' ? 'curKRW' : 'curUSD')}
           </div>
           <div className="board-mine__actions">
-            <IconButton
-              icon={<IconEdit size={18} />}
-              label={t('edit')}
-              variant="filled"
-              size="sm"
-              onClick={onEdit}
-              disabled={busy}
-            />
-            <IconButton
-              icon={<IconTrash size={18} />}
-              label={t('withdraw')}
-              variant="filled"
-              size="sm"
-              onClick={onWithdraw}
-              disabled={busy}
-            />
+            <Button variant="secondary" fullWidth onClick={onEdit} disabled={busy}>
+              {t('edit')}
+            </Button>
+            <Button variant="ghost" className="board-mine__withdraw" fullWidth onClick={onWithdraw} disabled={busy}>
+              {t('withdraw')}
+            </Button>
           </div>
         </div>
       </Card>
       <div className="board-status" role="status">
-        <p className="board-status__text">{status}</p>
+        <p className="board-status__text">{t(offer.side === 'buy' ? 'buyerHint' : 'sellerHint')}</p>
         {noContacts && (
           <Button variant="secondary" size="sm" fullWidth leading={<IconQr size={16} />} onClick={onOpenConnect}>
             {t('connect')}
