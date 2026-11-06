@@ -15,7 +15,8 @@
 }
 .ui-appbar__inner {
   display: grid;
-  grid-template-columns: minmax(var(--touch), 1fr) minmax(0, auto) minmax(var(--touch), 1fr);
+  /* Sides never shrink below their content; the title takes what is left and ellipsizes. */
+  grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr);
   align-items: center;
   width: 100%;
   max-width: var(--app-max-width);
@@ -27,7 +28,11 @@
   display: flex;
   align-items: center;
   gap: var(--sp-4);
-  min-width: 0;
+  min-width: var(--touch);
+  white-space: nowrap;
+}
+.ui-appbar__side > * {
+  flex-shrink: 0;
 }
 .ui-appbar__side--left {
   justify-content: flex-start;
@@ -36,6 +41,7 @@
   justify-content: flex-end;
 }
 .ui-appbar__title {
+  min-width: 0;
   overflow: hidden;
   max-width: 100%;
   text-overflow: ellipsis;

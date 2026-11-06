@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { Currency, Offer, Side } from '../../contracts'
 import { actions, useIlchon } from '../../engine/browser'
 import { useT } from '../../i18n'
@@ -47,6 +47,39 @@ export function OfferSheet({ open, onClose, editing }: OfferSheetProps) {
   const [feeText, setFeeText] = useState('0')
   const [tried, setTried] = useState(false)
   const [busy, setBusy] = useState(false)
+
+  // Thousands separators are re-inserted on every keystroke; without this the
+  // caret would jump to the end when editing in the middle of the number.
+  const caret = useRef<{ el: HTMLInputElement; sig: number } | null>(null)
+  const applyCaret = () => {
+    const c = caret.current
+    if (!c) return
+    caret.current = null
+    if (document.activeElement !== c.el) return
+    const v = c.el.value
+    let pos = 0
+    let seen = 0
+    while (pos < v.length && seen < c.sig) {
+      if (/[\d.]/.test(v.charAt(pos))) seen++
+      pos++
+    }
+    try {
+      c.el.setSelectionRange(pos, pos)
+    } catch {
+      // Some input types do not support selection; nothing to restore.
+    }
+  }
+  useLayoutEffect(applyCaret)
+  const changeAmount = (raw: string) => {
+    const el = document.activeElement
+    if (el instanceof HTMLInputElement && el.selectionStart !== null) {
+      const sig = raw.slice(0, el.selectionStart).replace(/[^\d.]/g, '').length
+      caret.current = { el, sig }
+      // Runs even when the sanitized text is unchanged and React skips the render.
+      requestAnimationFrame(applyCaret)
+    }
+    setAmountText(sanitizeAmount(raw, currency))
+  }
 
   // Fill the form at the moment the sheet opens. Done during render (not in an
   // effect) so the first painted frame already shows the right values.
@@ -165,7 +198,7 @@ export function OfferSheet({ open, onClose, editing }: OfferSheetProps) {
           <TextField
             label={t('amountLabel')}
             value={amountText}
-            onChange={(v) => setAmountText(sanitizeAmount(v, currency))}
+            onChange={changeAmount}
             inputMode={currency === 'KRW' ? 'numeric' : 'decimal'}
             autoComplete="off"
             placeholder="0"

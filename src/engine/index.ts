@@ -804,9 +804,45 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   /** contact -> repeats used for the current offer after a refusal (demo mode). */
   const mxRetries = new Map<PubkeyHex, number>()
 
-  function bump(field: 'asked' | 'answered'): void {
+  /**
+   * Which contacts matchProgress counted for the current offer, so a deleted
+   * contact can be taken out again. Memory only: after a reload it is rebuilt
+   * from the pending round sessions (see dropProgress).
+   */
+  const progressOf = new Map<PubkeyHex, 'asked' | 'answered'>()
+  /** True once progressOf covers every count of the current offer. */
+  let progressKnown = false
+
+  function resetProgress(): void {
+    progressOf.clear()
+    progressKnown = true
+  }
+
+  function bump(field: 'asked' | 'answered', contactId: PubkeyHex): void {
     const p = get().matchProgress
     set({ matchProgress: { ...p, [field]: p[field] + 1 } })
+    progressOf.set(contactId, field)
+    void save('progress')
+  }
+
+  /** Take a deleted contact out of matchProgress so the line can still finish. Call before its sessions are dropped. */
+  function dropProgress(contactId: PubkeyHex): void {
+    const offer = get().myOffer
+    if (!offer) return
+    let state = progressOf.get(contactId)
+    if (state === undefined && !progressKnown) {
+      const pending = Object.values(mem.init).some(
+        (s) => s.contactId === contactId && s.offerId === offer.id && !s.retry,
+      )
+      state = pending ? 'asked' : 'answered'
+    }
+    progressOf.delete(contactId)
+    if (state === undefined) return
+    const p = get().matchProgress
+    const asked = Math.max(0, p.asked - 1)
+    const answered = Math.min(asked, Math.max(0, p.answered - (state === 'answered' ? 1 : 0)))
+    if (asked === p.asked && answered === p.answered) return
+    set({ matchProgress: { asked, answered } })
     void save('progress')
   }
 
@@ -838,7 +874,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       mem.init[sid] = session
       await save('init')
       if (get().myOffer?.id !== offerId || mem.init[sid] !== session) return
-      if (!retry) bump('asked')
+      if (!retry) bump('asked', contactId)
       await send(c.groupId, { t: 'm1', sid, p })
     })
   }
@@ -888,7 +924,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     const offer = get().myOffer
     // My offer changed since round 1: the answer no longer means anything.
     if (!c || !offer || offer.id !== s.offerId) return
-    if (!s.retry) bump('answered')
+    if (!s.retry) bump('answered', from)
 
     let matched: boolean
     let qp: string
@@ -943,7 +979,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     void save('init')
     const offer = get().myOffer
     if (!offer || offer.id !== s.offerId) return
-    if (!s.retry) bump('answered')
+    if (!s.retry) bump('answered', from)
 
     // Demo mode: the peer's window is short, so ask once more after it passed.
     // Without this a re-posted offer in a live demo would silently find nobody.
@@ -1024,6 +1060,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
 
     retract()
     const offer: Offer = { id: randomId(), side, currency, amount, feePct, createdAt: now() }
+    resetProgress()
     set({ myOffer: offer, matches: [], matchProgress: ZERO_PROGRESS })
     await Promise.all([save('offer'), save('matches'), save('progress'), save('verified'), save('init')])
     for (const c of get().contacts) startRound(c.id, offer.id, false)
@@ -1032,6 +1069,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   async function withdrawOffer(): Promise<void> {
     if (!get().myOffer) return
     retract()
+    resetProgress()
     set({ myOffer: null, matches: [], matchProgress: ZERO_PROGRESS })
     await Promise.all([save('offer'), save('matches'), save('progress'), save('verified'), save('init')])
   }
@@ -1120,6 +1158,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     // Looks to the peer exactly like me taking my offer down.
     if (mem.verified[id] !== undefined) sendLater(id, c.groupId, () => ({ t: 'withdraw' }))
     mem.tombstones[id] = { groupId: c.groupId, at: now() }
+    dropProgress(id)
     delete mem.verified[id]
     for (const [sid, s] of Object.entries(mem.init)) if (s.contactId === id) delete mem.init[sid]
     for (const [key, s] of Object.entries(mem.resp)) if (s.contactId === id) delete mem.resp[key]

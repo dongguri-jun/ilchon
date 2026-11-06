@@ -211,8 +211,8 @@ function MyOffer({ offer, busy, contactCount, asked, answered, onEdit, onWithdra
   let status: string
   if (noContacts) status = t('noContacts')
   else if (asked <= 0) status = t('progressStarting')
-  else if (answered >= asked) status = t('progressAll', { asked })
-  else status = t('progress', { asked, answered })
+  else if (answered >= asked) status = t(asked === 1 ? 'progressAllOne' : 'progressAll', { asked })
+  else status = t(asked === 1 ? 'progressOne' : 'progress', { asked, answered })
 
   return (
     <>
