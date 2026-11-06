@@ -81,7 +81,7 @@ export function SetupScreen() {
                 </div>
               )}
               <header className="lock-head">
-                <h1 className="lock-name">{t('appName')}</h1>
+                <h1 className="lock-name"><img className="lock-logo" src="/brand/ilchon-logo-transparent.png" alt="ilchon" height={36} /></h1>
                 <p className="t-body1 t-dim">{t('setupIntro')}</p>
               </header>
               <div className="ui-stack">

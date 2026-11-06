@@ -35,6 +35,13 @@
   line-height: var(--lh-tight);
   letter-spacing: -0.02em;
 }
+.lock-logo {
+  display: block;
+  width: auto;
+  height: 36px;
+  max-width: 100%;
+  object-fit: contain;
+}
 .lock-icon {
   display: inline-flex;
   color: var(--c-accent);
@@ -72,7 +79,7 @@
   padding: var(--sp-8);
   border: 0;
   background: none;
-  color: var(--c-text-faint);
+  color: var(--c-text-dim);
   text-decoration: underline;
   cursor: pointer;
 }

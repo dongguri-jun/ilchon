@@ -1,6 +1,6 @@
 # ilchon design kit (src/ui)
 
-Web port of the Coconut Design System. Dark is the default theme; `<html data-theme="light">` switches to light.
+Web port of the Coconut Design System. Coconut light is the only theme; the page uses a white background and dark text.
 Import everything from `'../ui'` (or `'./ui'`). Importing it also loads `tokens.css` and registers the kit's own strings (i18n namespace `ui`), so no CSS import is needed in `main.tsx`.
 Wrap the app once in `<ToastProvider>`. Controls are 44px touch targets; text inputs are 16px (no iOS zoom).
 
@@ -52,5 +52,5 @@ Helper: `cx(...classNames)` joins truthy class names.
 
 ## Notes
 - Fonts: `public/fonts` (Pretendard 400/700, SpaceGrotesk 400/500/700), loaded from `/fonts/...`.
-- Dark theme is the default; nothing follows `prefers-color-scheme`. Set `document.documentElement.dataset.theme = 'light'` to switch.
+- Light is the only theme; there is no theme switch or `prefers-color-scheme` override. Primary buttons and selected chips keep Coconut lime with dark text. `--c-brand` is marmot brown for small brand accents only.
 - Motion honors `prefers-reduced-motion` globally.

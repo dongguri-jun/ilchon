@@ -44,7 +44,9 @@ export function UnlockScreen() {
       await actions.resetAll()
     } catch (e) {
       setResetting(false)
-      setErr(t(errorCode(e) === 'reset-failed' ? 'errResetFailed' : 'resetFailed'))
+      // 'reset-failed' also moves the app to the reset-failed screen.
+      const code = errorCode(e)
+      setErr(t(code === 'reset-failed' || code === 'reset-needs-unlock' ? errorKey(e) : 'resetFailed'))
     }
   }
 
@@ -53,10 +55,10 @@ export function UnlockScreen() {
       <DemoBanner />
       <div className="lock-screen">
         <div className="ui-page lock-body lock-body--center">
+          <h1 className="lock-name"><img className="lock-logo" src="/brand/ilchon-logo-transparent.png" alt="ilchon" height={36} /></h1>
           <span className="lock-icon" aria-hidden="true">
             <IconLock size={36} />
           </span>
-          <h1 className="lock-name">{t('appName')}</h1>
           <p className="t-body1 t-dim">{isPassword ? t('unlockPasswordBody') : t('unlockPasskeyBody')}</p>
 
           <div className="ui-stack lock-unlock">

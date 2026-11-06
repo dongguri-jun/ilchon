@@ -32,6 +32,8 @@ export function errorKey(e: unknown, ctx?: 'unlock'): string {
       return 'errCleanupFailed'
     case 'reset-failed':
       return 'errResetFailed'
+    case 'reset-needs-unlock':
+      return 'errResetNeedsUnlock'
     case 'corrupt':
       return ctx === 'unlock' ? 'errPasskeyMismatch' : 'errCorrupt'
     default:

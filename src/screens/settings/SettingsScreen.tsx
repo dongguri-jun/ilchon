@@ -83,7 +83,9 @@ export function SettingsScreen() {
     } catch (e) {
       setResetting(false)
       const code = e instanceof Error ? e.message : String(e)
-      toast.show(t(code === 'reset-failed' ? 'resetFailedTabs' : 'resetFailed'), 'error')
+      // A half-done reset moves the app to its own screen (boot 'error', 'reset-failed').
+      if (code === 'reset-failed') return
+      toast.show(t('resetFailed'), 'error')
     }
   }
 

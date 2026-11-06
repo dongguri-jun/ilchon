@@ -341,3 +341,13 @@
   flex: none;
   margin-top: 1px;
 }
+
+/* Keep the wordmark inside the existing centered AppBar title slot. */
+.board__logo {
+  display: block;
+  height: 28px;
+  width: auto;
+  margin: 0 auto;
+  object-fit: contain;
+  border-bottom: 1px solid var(--c-brand);
+}

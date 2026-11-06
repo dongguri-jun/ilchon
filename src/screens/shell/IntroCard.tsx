@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { useT } from '../../i18n'
+import { getProfileNamespace } from '../../lib/profile'
 import { Card, IconButton, IconClose } from '../../ui'
 
-const KEY = 'ilchon:intro-dismissed'
+function dismissalKey(): string {
+  return `${getProfileNamespace()}:intro-dismissed`
+}
 
 function wasDismissed(): boolean {
   try {
-    return localStorage.getItem(KEY) === '1'
+    return localStorage.getItem(dismissalKey()) === '1'
   } catch {
     return false
   }
@@ -21,7 +24,7 @@ export function IntroCard() {
   const dismiss = () => {
     setHidden(true)
     try {
-      localStorage.setItem(KEY, '1')
+      localStorage.setItem(dismissalKey(), '1')
     } catch {
       // Private mode: the card simply comes back next time.
     }

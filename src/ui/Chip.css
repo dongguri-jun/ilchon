@@ -27,9 +27,9 @@ button.ui-chip::after {
 }
 .ui-chip.is-selected {
   border-width: 1px;
-  border-color: var(--c-accent);
-  background: var(--c-accent-soft);
-  color: var(--c-accent);
+  border-color: var(--c-primary);
+  background: var(--c-primary);
+  color: var(--c-on-primary);
   font-weight: var(--fw-bold);
 }
 button.ui-chip:active:not(:disabled) {

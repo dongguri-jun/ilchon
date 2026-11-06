@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import QRCode from 'qrcode'
+import { useT } from '../../i18n'
+import '../strings'
 import './qr.css'
 
 export interface QrCodeProps {
@@ -40,6 +42,7 @@ function buildMatrix(text: string): Matrix | null {
 }
 
 export function QrCode({ text, size }: QrCodeProps) {
+  const t = useT('ui')
   const matrix = useMemo(() => buildMatrix(text), [text])
   const style = { width: size, height: size }
 
@@ -54,7 +57,7 @@ export function QrCode({ text, size }: QrCodeProps) {
         height={size}
         shapeRendering="crispEdges"
         role="img"
-        aria-label="QR"
+        aria-label={t('qrCode')}
       >
         <rect width={view} height={view} fill="#fff" />
         <path d={matrix.path} fill="#000" />

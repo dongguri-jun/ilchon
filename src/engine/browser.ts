@@ -65,14 +65,17 @@ function deleteDatabase(name: string): Promise<boolean> {
  * gives each identity its own transport namespace, so anything this sweep
  * misses is never read again. Resolves false when something could not be deleted.
  */
-async function wipeProfileStores(): Promise<boolean> {
+async function wipeProfileStores(mustList: boolean): Promise<boolean> {
   let ok = true
-  // indexedDB.databases() is missing in some browsers; the named purge in onReset covers that case.
+  // indexedDB.databases() is missing in some browsers; the named purge in onReset covers
+  // that case. Without a pubkey (`mustList`) nothing else finds the transport stores.
   let names: string[] = []
   try {
-    names = ((await indexedDB.databases?.()) ?? []).flatMap((d) => (d.name && ownedByProfile(d.name) ? [d.name] : []))
+    if (typeof indexedDB.databases !== 'function') throw new Error('no-list')
+    names = (await indexedDB.databases()).flatMap((d) => (d.name && ownedByProfile(d.name) ? [d.name] : []))
   } catch {
     names = []
+    if (mustList) ok = false
   }
   const results = await Promise.all(names.map(deleteDatabase))
   if (results.includes(false)) ok = false
@@ -110,10 +113,20 @@ export const engine = createEngine(
           ok = false
         })
       }
-      if (!(await wipeProfileStores())) ok = false
+      if (!(await wipeProfileStores(!pubkey))) ok = false
       // The engine turns this into 'reset-failed'; reloading now would look like a finished wipe.
       if (!ok) throw new Error('reset-failed')
       location.reload()
+    },
+    async canResetWithoutPubkey() {
+      // Only by listing the databases can reset find a store whose name it does not know.
+      try {
+        if (typeof indexedDB.databases !== 'function') return false
+        await indexedDB.databases()
+        return true
+      } catch {
+        return false
+      }
     },
     onExternalChange() {
       // Another tab created, re-locked or wiped this profile's identity.

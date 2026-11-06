@@ -28,7 +28,7 @@ registerStrings('lock', {
     noneWarnConfirm: '잠그지 않고 쓰기',
     password: '비밀번호',
     passwordConfirm: '비밀번호 확인',
-    passwordHelp: '8자 이상이에요.',
+    passwordHelp: '8자 이상 입력해 주세요.',
     lockAction: '잠그고 시작하기',
     lockSave: '이 방식으로 바꾸기',
     current: '지금 방식',
@@ -70,6 +70,7 @@ registerStrings('lock', {
     errBusy: '처리 중이에요. 잠시만 기다려 주세요.',
     errCleanupFailed: '이전 키를 지우지 못했어요. 다시 시도해 주세요.',
     errResetFailed: '초기화를 끝내지 못했어요. 다른 탭을 닫고 다시 시도해 주세요.',
+    errResetNeedsUnlock: '이 기기에서는 잠금을 푼 뒤에 초기화할 수 있어요.',
     errPrfUnlock: '이 기기에서 패스키를 읽지 못했어요. 다른 기기나 백업으로 열어 주세요.',
     errPasskeyMismatch: '이 패스키로는 키를 풀 수 없어요. 처음 잠근 패스키로 다시 시도해 주세요.',
 
@@ -109,7 +110,7 @@ registerStrings('lock', {
     noneWarnConfirm: 'Use without a lock',
     password: 'Password',
     passwordConfirm: 'Confirm password',
-    passwordHelp: 'At least 8 characters.',
+    passwordHelp: 'Use at least 8 characters.',
     lockAction: 'Lock and start',
     lockSave: 'Switch to this',
     current: 'Current',
@@ -151,6 +152,7 @@ registerStrings('lock', {
     errBusy: 'Working on it. Please wait a moment.',
     errCleanupFailed: "Couldn't remove the old key. Please try again.",
     errResetFailed: "Reset didn't finish. Close other tabs and try again.",
+    errResetNeedsUnlock: 'On this device, unlock first, then reset.',
     errPrfUnlock: "Couldn't read the passkey on this device. Open it on another device or from a backup.",
     errPasskeyMismatch: "This passkey can't unlock the key. Try the passkey you locked it with.",
 

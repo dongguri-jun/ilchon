@@ -8,6 +8,7 @@ registerStrings('ui', {
     close: '닫기',
     back: '뒤로',
     loading: '불러오는 중',
+    qrCode: 'QR 코드',
   },
   en: {
     confirm: 'OK',
@@ -15,5 +16,6 @@ registerStrings('ui', {
     close: 'Close',
     back: 'Back',
     loading: 'Loading',
+    qrCode: 'QR code',
   },
 })

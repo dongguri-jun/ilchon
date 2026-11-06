@@ -14,7 +14,7 @@
   padding: calc(var(--safe-t) + var(--sp-4)) calc(var(--sp-12) + var(--safe-r)) var(--sp-4)
     calc(var(--sp-12) + var(--safe-l));
   background: var(--c-warning-soft);
-  color: var(--c-warning);
+  color: var(--c-text);
   text-align: center;
 }
 .shell-banner__text {

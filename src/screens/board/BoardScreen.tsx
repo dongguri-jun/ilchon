@@ -133,7 +133,7 @@ export function BoardScreen({ onOpenRoom, onOpenConnect, intro }: BoardScreenPro
 
   return (
     <div className="board">
-      <AppBar title={t('title')} />
+      <AppBar title={<img className="board__logo" src="/brand/ilchon-logo-transparent.png" alt="ilchon" />} />
 
       <div className="ui-page ui-has-nav board__body">
         {intro}

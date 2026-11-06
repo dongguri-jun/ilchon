@@ -106,7 +106,7 @@
   background: var(--c-danger-pressed);
 }
 
-/* disabled (Coconut: gray800 / gray700 in dark) */
+/* disabled (Coconut light) */
 .ui-btn:disabled:not(.is-loading) {
   color: var(--c-disabled-text);
 }

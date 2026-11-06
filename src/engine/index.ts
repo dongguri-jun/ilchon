@@ -81,6 +81,13 @@ export interface EngineHooks {
    */
   onReset?: (info: { pubkey?: PubkeyHex }) => void | Promise<void>
   /**
+   * Asked before anything is deleted when the identity's pubkey is unknown (a
+   * locked account from before the stored pubkey): can onReset still find the
+   * transport stores (e.g. by enumerating databases)? False rejects resetAll
+   * with 'reset-needs-unlock'. Without it the answer is yes.
+   */
+  canResetWithoutPubkey?: () => boolean | Promise<boolean>
+  /**
    * Another tab of this profile wrote or wiped the identity. The browser reloads
    * here. Without it no cross-tab channel is opened (Node scripts).
    */
@@ -107,6 +114,8 @@ interface CodeRec {
   createdAt: number
   used: boolean
   usedBy?: PubkeyHex
+  /** Consumed by a restore request carrying this nonce; only that request is echoed again. */
+  restoreNonce?: string
 }
 
 /** One scan of a peer's QR. Doubles as the record of the link in progress. */
@@ -125,10 +134,13 @@ interface ScanRec {
   replied?: boolean
   /**
    * Re-adding a deleted contact over the group we still share: I sent hello
-   * { code: peer's code } and restore the contact only once the peer echoes it,
-   * which proves the code was one it issued just now.
+   * { code: peer's code, r: nonce } and restore the contact only once the peer
+   * echoes that code with the same nonce, which it does only after consuming
+   * the code fresh (unused, young) for this nonce.
    */
   restore?: boolean
+  /** Restore only: random nonce of this restore attempt. */
+  nonce?: string
 }
 
 /** Inviter: a confirmation hello that must reach the invitee, kept across reloads. */
@@ -145,6 +157,8 @@ interface DeferredRound {
 }
 
 interface InitSession {
+  /** Original point for resending a crossed start without changing its secret. */
+  p?: string
   sid: string
   contactId: PubkeyHex
   secret: string
@@ -277,6 +291,11 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
      * other with guessed labels.
      */
     respondLog: {} as Record<PubkeyHex, number>,
+    /**
+     * pubkey -> the round that holds this window's budget: 'i:<sid>' (I started
+     * it) or 'r:<sid>' (I answered it). Only that round may send m2/m3 or finish.
+     */
+    roundOwner: {} as Record<PubkeyHex, string>,
     /** contact -> a round of my current offer waiting for the round window to pass. */
     deferred: {} as Record<PubkeyHex, DeferredRound>,
     /** invitee -> my confirmation hello that may not have reached it yet. */
@@ -334,6 +353,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     init: () => mem.init,
     resp: () => mem.resp,
     respondLog: () => mem.respondLog,
+    roundOwner: () => mem.roundOwner,
     deferred: () => mem.deferred,
     confirms: () => mem.confirms,
     seen: () => mem.seen,
@@ -391,6 +411,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     mem.init = (await kv.get<Record<string, InitSession>>('init')) ?? {}
     mem.resp = (await kv.get<Record<string, RespSession>>('resp')) ?? {}
     mem.respondLog = (await kv.get<Record<PubkeyHex, number>>('respondLog')) ?? {}
+    mem.roundOwner = (await kv.get<Record<PubkeyHex, string>>('roundOwner')) ?? {}
     mem.deferred = (await kv.get<Record<PubkeyHex, DeferredRound>>('deferred')) ?? {}
     mem.confirms = (await kv.get<Record<PubkeyHex, PendingConfirm>>('confirms')) ?? {}
     mem.seen = (await kv.get<string[]>('seen')) ?? []
@@ -398,8 +419,28 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     seenSet.clear()
     for (const id of mem.seen) seenSet.add(id)
 
+    // Migrate ownerless sessions before pruning: never erase their spent budget.
+    for (const sessions of [mem.init, mem.resp]) {
+      for (const [key, session] of Object.entries(sessions)) {
+        if (mem.roundOwner[session.contactId]) continue
+        delete sessions[key]
+        if (offer && contacts.some((c) => c.pubkey === session.contactId)) {
+          mem.deferred[session.contactId] = { offerId: offer.id, retry: true }
+        }
+      }
+    }
+    await Promise.all([save('init'), save('resp'), save('deferred')])
+
     // Sessions of an offer that no longer exists can never complete.
-    for (const [sid, s] of Object.entries(mem.init)) if (!offer || s.offerId !== offer.id) delete mem.init[sid]
+    // Their reservation is released: such a round never sent m3, so it revealed nothing.
+    for (const [sid, s] of Object.entries(mem.init)) {
+      if (offer && s.offerId === offer.id) continue
+      delete mem.init[sid]
+      if (mem.roundOwner[s.contactId] === `i:${sid}`) {
+        delete mem.roundOwner[s.contactId]
+        delete mem.respondLog[s.contactId]
+      }
+    }
     for (const [pk, d] of Object.entries(mem.deferred)) if (!offer || d.offerId !== offer.id) delete mem.deferred[pk]
     pruneRespSessions(t)
 
@@ -499,6 +540,14 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   function dropItem(it: OutItem, why: string): void {
     debug('tx-dropped', { t: it.msg.t, why })
     it.settle?.(false)
+    if (why === 'retries' && it.peer) {
+      const owner = mem.roundOwner[it.peer]
+      if (owner?.startsWith('i:') && ['m1', 'm3', 'offer'].includes(it.msg.t)) {
+        const sid = owner.slice(2)
+        if ((it.msg.t === 'm1' || it.msg.t === 'm3') && it.msg.sid !== sid) return
+        recoverInit(it.peer, sid)
+      }
+    }
   }
 
   /**
@@ -697,12 +746,20 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       // the peer echoes the fresh code of the QR I scanned (see onHello).
       const stale = dropBuffered(pk)
       if (stale) ignoreInvite(stale.id)
-      const scan: ScanRec = { pk, code: p.code, at: now(), inviter: false, groupId: tomb.groupId, restore: true }
+      const scan: ScanRec = {
+        pk,
+        code: p.code,
+        at: now(),
+        inviter: false,
+        groupId: tomb.groupId,
+        restore: true,
+        nonce: randomId(),
+      }
       mem.scans[pk] = scan
       void save('scans')
       armLinkTimeout(pk, scan.at)
       set({ connect: { ...base, phase: 'linking', peerPubkey: pk, errorKey: undefined, contactId: undefined } })
-      await enqueue(pk, () => send(tomb.groupId, { t: 'hello', v: 1, code: scan.code }, { peer: pk }).then(() => {}))
+      await enqueue(pk, () => send(tomb.groupId, helloOf(scan), { peer: pk }).then(() => {}))
       resendHello(scan, tomb.groupId, 0)
       return
     }
@@ -777,12 +834,19 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     resendHello(scan, groupId, 0)
   }
 
+  /** My hello for this scan: the peer's code, plus the restore nonce when restoring. */
+  function helloOf(scan: ScanRec): WireMessage {
+    return scan.restore && scan.nonce
+      ? { t: 'hello', v: 1, code: scan.code, r: scan.nonce }
+      : { t: 'hello', v: 1, code: scan.code }
+  }
+
   /** The first hello can be published before the peer has joined. Repeating it is harmless. */
   function resendHello(scan: ScanRec, groupId: string, i: number): void {
     if (i >= HELLO_RESEND_MS.length) return
     later(HELLO_RESEND_MS[i], () => {
       if (mem.scans[scan.pk] !== scan || scan.groupId !== groupId) return
-      void send(groupId, { t: 'hello', v: 1, code: scan.code }, { peer: scan.pk })
+      void send(groupId, helloOf(scan), { peer: scan.pk })
       resendHello(scan, groupId, i + 1)
     })
   }
@@ -858,23 +922,49 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   async function onHello(m: IncomingMessage, msg: Wire<'hello'>): Promise<void> {
     const from = m.senderPubkey
     if (typeof msg.code !== 'string') return
+    const nonce = typeof msg.r === 'string' && msg.r.length > 0 && msg.r.length <= 64 ? msg.r : undefined
     const rec = mem.codes.find((c) => c.code === msg.code)
+    // First consumption: a code of mine, unused, young at receipt.
     const fresh = rec !== undefined && !rec.used && now() - rec.createdAt <= CODE_REDEEM_MS
+
+    /**
+     * A restore request (hello with a nonce) carrying a code of mine: accept it
+     * when the code is fresh (consumed now, for this nonce) or when it repeats a
+     * request I already accepted (same code, same peer, same nonce).
+     */
+    const takeRestore = (): boolean => {
+      if (!nonce || !rec) return false
+      if (fresh) {
+        rec.used = true
+        rec.usedBy = from
+        rec.restoreNonce = nonce
+        void save('codes')
+        return true
+      }
+      return rec.usedBy === from && rec.restoreNonce === nonce
+    }
+    const echoRestore = async (): Promise<void> => {
+      const key = `${msg.code}:${nonce}`
+      const n = echoes.get(key) ?? 0
+      if (n >= ECHO_MAX) return
+      echoes.set(key, n + 1)
+      await send(m.groupId, { t: 'hello', v: 1, code: msg.code, r: nonce }, { peer: from })
+    }
 
     if (contactOf(from)) {
       if (!activeContact(from, m.groupId)) return
-      // Echo a hello back when it carries a code of mine that this contact redeemed:
-      //  - inviter: the invitee repeats its reply until it has seen my confirmation
-      //    (also after I reloaded, from the persisted confirmation or code record);
-      //  - a contact that deleted me scanned my fresh QR to restore me.
+      if (nonce) {
+        // A contact that deleted me scanned my fresh QR to restore me.
+        if (takeRestore()) await echoRestore()
+        return
+      }
+      // Echo a plain hello back when it carries a code of mine that this contact
+      // already redeemed: the invitee repeats its reply until it has seen my
+      // confirmation (also after I reloaded, from the persisted confirmation or
+      // code record). Such an echo carries no nonce, so it never proves a restore.
       const pending = mem.confirms[from]
       const repeat = rec?.usedBy === from || (pending?.groupId === m.groupId && pending.code === msg.code)
-      if (!repeat && !fresh) return
-      if (fresh && rec) {
-        rec.used = true
-        rec.usedBy = from
-        void save('codes')
-      }
+      if (!repeat) return
       const n = echoes.get(msg.code) ?? 0
       if (n >= ECHO_MAX) return
       echoes.set(msg.code, n + 1)
@@ -886,16 +976,16 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     if (!scan || scan.groupId !== m.groupId) return
 
     if (scan.restore) {
-      // The peer echoed the code of its QR I scanned: restore. Or the peer deleted
-      // me too and is restoring with my fresh code: restore and echo it back.
-      if (msg.code !== scan.code && !fresh) return
-      if (fresh && rec) {
-        rec.used = true
-        rec.usedBy = from
-        void save('codes')
+      // The peer echoed my restore request: it consumed the code of its QR I
+      // scanned, fresh, for this very attempt. Restore.
+      if (msg.code === scan.code) {
+        if (scan.nonce && nonce === scan.nonce) createContact(from, m.groupId)
+        return
       }
+      // The peer deleted me too and restores with my fresh code: restore and echo.
+      if (!takeRestore()) return
       createContact(from, m.groupId)
-      if (fresh) await send(m.groupId, { t: 'hello', v: 1, code: msg.code }, { peer: from })
+      await echoRestore()
       return
     }
 
@@ -910,10 +1000,9 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       return
     }
 
-    // The inviter's own displayed code may have rotated out while the invitee
-    // joined; age it from my scan, which started this link, not from now.
-    const ref = scan.inviter ? scan.at : now()
-    if (!rec || rec.used || ref - rec.createdAt > CODE_REDEEM_MS) {
+    // First consumption only, aged at receipt. Repeats of an exchange I already
+    // verified are answered above from the stored state (usedBy, confirms, replied).
+    if (!rec || !fresh) {
       debug('hello-rejected', { from: short(from) })
       return
     }
@@ -1027,6 +1116,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       if (c) sendLater(pk, c.groupId, () => ({ t: 'withdraw' }))
     }
     mem.verified = {}
+    for (const s of Object.values(mem.init)) releaseInit(s.contactId, s.sid)
     mem.init = {}
     mem.deferred = {}
     for (const id of deferTimers.values()) cancel(id)
@@ -1047,10 +1137,51 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     return until > now() ? until : 0
   }
 
-  /** Spend the shared round budget with `pk`. False when that could not be stored: then do not go on. */
-  async function spendBudget(pk: PubkeyHex): Promise<boolean> {
+  /**
+   * Spend the shared round budget with `pk` for the round `owner` ('i:<sid>' or
+   * 'r:<sid>'). False when that could not be stored: then do not go on.
+   */
+  async function spendBudget(pk: PubkeyHex, owner: string): Promise<boolean> {
     mem.respondLog[pk] = now()
-    return save('respondLog')
+    mem.roundOwner[pk] = owner
+    const [a, b] = await Promise.all([save('respondLog'), save('roundOwner')])
+    return a && b
+  }
+
+  /**
+   * Give back the budget a round I started holds, when that round ends before I
+   * sent m3 (refused, or my offer changed). It revealed nothing: only m2 and m3
+   * let the peer learn a result. The budget was free when the round started.
+   */
+  function releaseInit(pk: PubkeyHex, sid: string): void {
+    if (mem.roundOwner[pk] !== `i:${sid}`) return
+    delete mem.roundOwner[pk]
+    delete mem.respondLog[pk]
+    void save('roundOwner')
+    void save('respondLog')
+  }
+
+  /** Recover an unanswered round; a completed m3 still retains its spent budget. */
+  function recoverInit(pk: PubkeyHex, sid: string): void {
+    const pending = mem.init[sid]
+    const spent = mem.respondLog[pk]
+    delete mem.init[sid]
+    releaseInit(pk, sid)
+    if (!pending && spent !== undefined) {
+      mem.respondLog[pk] = spent
+      void save('respondLog')
+    }
+    void save('init')
+    deferCurrent(pk)
+  }
+
+  function deferCurrent(pk: PubkeyHex): void {
+    const offer = get().myOffer
+    if (!offer || !contactOf(pk)) return
+    const d: DeferredRound = { offerId: offer.id, retry: true }
+    mem.deferred[pk] = d
+    void save('deferred')
+    armDeferred(pk, d, budgetFreeAt(pk) || now())
   }
 
   const deferTimers = new Map<PubkeyHex, number>()
@@ -1095,12 +1226,25 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       const sid = randomId()
       const label = match.labelFor({ context: c.groupId, myPubkey: me, peerPubkey: c.pubkey, offer })
       const { secret, p } = match.round1(label)
-      const session: InitSession = { sid, contactId, secret, offerId, at: now() }
+      const session: InitSession = { sid, contactId, secret, p, offerId, at: now() }
       if (retry) session.retry = true
       mem.init[sid] = session
-      await save('init')
+      // The round holds the budget from its start, so no other round with this
+      // contact (either role) can run beside it.
+      const [, spent] = await Promise.all([save('init'), spendBudget(contactId, `i:${sid}`)])
+      if (!spent) {
+        delete mem.init[sid]
+        releaseInit(contactId, sid)
+        void save('init')
+        return
+      }
       if (get().myOffer?.id !== offerId || mem.init[sid] !== session) return
       if (!retry && !asked) bump('asked', contactId)
+      later(90_000, () => {
+        void enqueue(contactId, async () => {
+          if (mem.init[sid] === session) recoverInit(contactId, sid)
+        })
+      })
       await send(c.groupId, { t: 'm1', sid, p }, { peer: contactId })
     })
   }
@@ -1114,12 +1258,41 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     if (!active && !ghost) return
 
     const t = now()
+    let yielded: InitSession | undefined
     if (budgetFreeAt(from)) {
-      await send(m.groupId, { t: 'mx', sid: msg.sid }, { peer: from })
-      return
+      // A round with this contact holds the window. Only one case is not a
+      // refusal: we both started a round at once and mine has not been answered.
+      const owner = mem.roundOwner[from]
+      const mine = owner?.startsWith('i:') ? mem.init[owner.slice(2)] : undefined
+      if (!mine || mine.contactId !== from) {
+        await send(m.groupId, { t: 'mx', sid: msg.sid }, { peer: from })
+        return
+      }
+      // Crossed starts: the round started by the lower pubkey goes on. If that
+      // is mine, resend it so a peer that missed m1 can answer and defer its own.
+      if (me < from) {
+        debug('round-crossed', { peer: short(from), kept: 'mine' })
+        if (mine.p) await send(m.groupId, { t: 'm1', sid: mine.sid, p: mine.p }, { peer: from })
+        else recoverInit(from, mine.sid)
+        return
+      }
+      // The peer's round goes on: mine ends unanswered (it never sent m3) and waits.
+      delete mem.init[mine.sid]
+      void save('init')
+      yielded = mine
+      debug('round-crossed', { peer: short(from), kept: 'theirs' })
     }
     // Answer only once the spent budget is stored, or a reload would let the peer ask again.
-    if (!(await spendBudget(from))) return
+    if (!(await spendBudget(from, `r:${msg.sid}`))) return
+    if (yielded && get().myOffer?.id === yielded.offerId) {
+      // This answer already compares my current offer with the peer's, so count
+      // the contact as answered; my own round runs once the window passed.
+      if (!yielded.retry) bump('answered', from)
+      const d: DeferredRound = { offerId: yielded.offerId, retry: true }
+      mem.deferred[from] = d
+      void save('deferred')
+      armDeferred(from, d, budgetFreeAt(from) || now())
+    }
 
     const offer = active ? get().myOffer : null
     let q: string
@@ -1144,13 +1317,18 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     delete mem.init[msg.sid]
     void save('init')
 
+    // Only the round that holds this window's budget may send m3 (which lets the peer learn).
+    if (mem.roundOwner[from] !== `i:${msg.sid}`) {
+      debug('round-not-owner', { peer: short(from) })
+      return
+    }
     const c = activeContact(from, m.groupId)
     const offer = get().myOffer
     // My offer changed since round 1: the answer no longer means anything.
     if (!c || !offer || offer.id !== s.offerId) return
     if (!s.retry) bump('answered', from)
-    // Completing a round spends the budget with this contact, like answering one.
-    if (!(await spendBudget(from))) return
+    // Completing a round spends the budget with this contact again, from now.
+    if (!(await spendBudget(from, `i:${msg.sid}`))) return
 
     let matched: boolean
     let qp: string
@@ -1179,6 +1357,11 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     if (!s) return
     delete mem.resp[key]
     void save('resp')
+    // Only the round that holds this window's budget may finish.
+    if (mem.roundOwner[from] !== `r:${msg.sid}`) {
+      debug('round-not-owner', { peer: short(from) })
+      return
+    }
 
     let matched = false
     try {
@@ -1204,6 +1387,8 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     if (!s || s.contactId !== from) return
     delete mem.init[msg.sid]
     void save('init')
+    // Refused: this round sent only m1, so its budget goes back.
+    releaseInit(from, msg.sid)
     const offer = get().myOffer
     if (!offer || offer.id !== s.offerId) return
     if (!s.retry) bump('answered', from)
@@ -1415,7 +1600,11 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     mem.tombstones[id] = { groupId: c.groupId, at: now() }
     dropProgress(id)
     delete mem.verified[id]
-    for (const [sid, s] of Object.entries(mem.init)) if (s.contactId === id) delete mem.init[sid]
+    for (const [sid, s] of Object.entries(mem.init)) {
+      if (s.contactId !== id) continue
+      delete mem.init[sid]
+      releaseInit(id, sid)
+    }
     for (const [key, s] of Object.entries(mem.resp)) if (s.contactId === id) delete mem.resp[key]
     delete mem.deferred[id]
     cancel(deferTimers.get(id))
@@ -1891,6 +2080,13 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       sendLater(pk, c.groupId, () => ({ t: 'hello', v: 1, code: c.code }))
     }
     if (changed) void save('confirms')
+    // Initiators surviving reload have no persisted outbox to carry m1.
+    for (const [sid, s] of Object.entries(mem.init)) {
+      if (mem.roundOwner[s.contactId] === `i:${sid}` &&
+        ![...outbox.values()].some((box) => box.items.some((it) => it.msg.t === 'm1' && it.msg.sid === sid))) {
+        recoverInit(s.contactId, sid)
+      }
+    }
     const offer = get().myOffer
     for (const [pk, d] of Object.entries(mem.deferred)) {
       if (offer && offer.id === d.offerId && contactOf(pk)) armDeferred(pk, d, budgetFreeAt(pk) || t)
@@ -1922,8 +2118,30 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   }
 
   let resetPubkey: PubkeyHex | undefined
+  /** A reset began deleting; a retry must finish it, whatever it can still find. */
+  let resetStarted = false
+
+  /** A reset that deleted something but not everything: no way back to the normal UI. */
+  function resetFailed(): never {
+    debug('reset-failed')
+    set({ boot: 'error', bootError: 'reset-failed' })
+    throw new Error('reset-failed')
+  }
 
   async function resetAll(): Promise<void> {
+    // While locked `me` is unknown; the stored pubkey still names the transport stores.
+    const stored = me || resetPubkey || (await kv.get<string>('pubkey').catch(() => undefined))
+    const pubkey = typeof stored === 'string' && HEX64.test(stored) ? stored : undefined
+    // A locked account from before the stored pubkey, on a device that cannot list
+    // its databases: the message store could not be found once the key is gone.
+    // Refuse before deleting anything; after an unlock the pubkey is known.
+    if (!pubkey && !resetStarted && hooks.canResetWithoutPubkey) {
+      const can = await Promise.resolve()
+        .then(() => hooks.canResetWithoutPubkey?.())
+        .catch(() => false)
+      if (!can) throw new Error('reset-needs-unlock')
+    }
+    resetStarted = true
     frozen = true
     await shutdown()
     await writeChain.catch(() => {})
@@ -1932,9 +2150,6 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     pendingRestore = null
     pendingNew = ''
     reauthUntil = 0
-    // While locked `me` is unknown; the stored pubkey still names the transport stores.
-    const stored = me || resetPubkey || (await kv.get<string>('pubkey').catch(() => undefined))
-    const pubkey = typeof stored === 'string' && HEX64.test(stored) ? stored : undefined
     // A retry after a failed reset no longer finds it in KV.
     resetPubkey = pubkey
     let ok = true
@@ -1947,15 +2162,11 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       ok = false
     }
     announce()
-    if (!ok) {
-      debug('reset-failed')
-      throw new Error('reset-failed')
-    }
+    if (!ok) resetFailed()
     try {
       await hooks.onReset?.({ pubkey })
     } catch {
-      debug('reset-failed')
-      throw new Error('reset-failed')
+      resetFailed()
     }
   }
 

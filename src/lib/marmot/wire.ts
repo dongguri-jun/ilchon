@@ -41,8 +41,11 @@ export function parseWireMessage(content: string): WireMessage | null {
   }
   if (!isRecord(value)) return null
   switch (value.t) {
-    case 'hello':
-      return value.v === 1 && isString(value.code) ? { t: 'hello', v: 1, code: value.code } : null
+    case 'hello': {
+      if (value.v !== 1 || !isString(value.code)) return null
+      if (value.r !== undefined && (!isString(value.r) || !/^[A-Za-z0-9_-]{16,64}$/.test(value.r))) return null
+      return { t: 'hello', v: 1, code: value.code, ...(value.r === undefined ? {} : { r: value.r }) }
+    }
     case 'm1':
       return isString(value.sid) && isString(value.p)
         ? { t: 'm1', sid: value.sid, p: value.p }

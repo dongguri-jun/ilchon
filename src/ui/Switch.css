@@ -23,7 +23,7 @@
   height: 27px;
   border-radius: 50%;
   background: var(--c-switch-off-thumb);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 4px var(--c-shadow);
   transition: transform var(--dur-base) var(--ease-out), background-color var(--dur-base) ease;
 }
 .ui-switch.is-on {

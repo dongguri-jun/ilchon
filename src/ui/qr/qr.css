@@ -1,7 +1,7 @@
 .qr-tile {
   display: inline-block;
   box-sizing: border-box;
-  background: #fff;
+  background: var(--coco-white);
   border-radius: var(--radius-md, 16px);
   overflow: hidden;
   line-height: 0;
@@ -13,14 +13,14 @@
 }
 
 .qr-tile--empty {
-  background: var(--c-surface, #1c1c1e);
+  background: var(--c-surface);
 }
 
 .qr-scanner {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: var(--c-surface, #1c1c1e);
+  background: var(--c-surface);
   border-radius: var(--radius-md, 16px);
   overflow: hidden;
 }
@@ -41,8 +41,8 @@
 .qr-scanner__frame {
   position: absolute;
   inset: 14%;
-  border: 2px solid var(--c-primary, #f7931a);
+  border: 2px solid var(--c-primary);
   border-radius: var(--radius-md, 16px);
-  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 100vmax var(--c-backdrop);
   pointer-events: none;
 }

@@ -67,8 +67,13 @@ export type PublicOffer = Pick<Offer, 'side' | 'currency' | 'amount' | 'feePct' 
 export const ILCHON_KIND = 4242
 
 export type WireMessage =
-  /** Connect: redeem the one-time code the receiver showed in its QR. */
-  | { t: 'hello'; v: 1; code: string }
+  /**
+   * Connect: redeem the one-time code the receiver showed in its QR.
+   * `r` marks a restore of a deleted contact: a fresh random nonce per restore
+   * attempt. The receiver echoes a hello with `r` only after it consumed a fresh
+   * code for that same nonce, so a plain (confirmation) echo never proves a restore.
+   */
+  | { t: 'hello'; v: 1; code: string; r?: string }
   /** Match round 1, initiator -> responder. `p` = H(label_i)^a */
   | { t: 'm1'; sid: string; p: string }
   /**
@@ -468,8 +473,10 @@ export interface IlchonActions {
   markBackedUp(): Promise<void>
   /**
    * Wipes this profile's local data and reloads. Rejects with 'reset-failed'
-   * (and does not reload) when something could not be deleted; calling it
-   * again retries.
+   * (and does not reload) when something could not be deleted; boot is then
+   * 'error' with bootError 'reset-failed', and calling it again retries.
+   * Rejects with 'reset-needs-unlock' (nothing deleted, state unchanged) when
+   * the locked identity's message store cannot be found on this device.
    */
   resetAll(): Promise<void>
 }
