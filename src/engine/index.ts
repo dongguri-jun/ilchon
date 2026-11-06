@@ -1259,7 +1259,8 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       }
       if (get().myOffer?.id !== offerId || mem.init[sid] !== session) return
       if (!retry && !asked) bump('asked', contactId)
-      const deadline = isShortInterval() ? roundWindow() : 90_000
+      // A relay round trip takes seconds: a 1s live window must not expire the round before m2 can arrive.
+      const deadline = isShortInterval() ? Math.max(roundWindow(), 15_000) : 90_000
       const expire = (): void => {
         void enqueue(contactId, async () => {
           if (mem.init[sid] !== session) return
