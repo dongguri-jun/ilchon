@@ -11,6 +11,8 @@
  *   src/lib/connect/  connect payload      one-time QR codes
  *   src/lib/rates/    RatesSource          BTC price in KRW and USD
  *   src/lib/kv/       KV implementations   browser (IndexedDB) and memory
+ *   src/lib/vault/    VaultModule          secret key lock: passkey PRF, NIP-49 password, none
+ *   src/lib/pwa/      PWA helpers          install hint, standalone, storage persistence
  *   src/engine/       Engine               all app logic, no DOM, runs in Node too
  *   src/ui/           design kit           Coconut design tokens + components
  *   src/screens/      screens              React, reads Engine state only
@@ -329,9 +331,49 @@ export interface Settings {
 export const RESPOND_WINDOW_MS = 24 * 60 * 60 * 1000
 export const RESPOND_WINDOW_DEMO_MS = 20 * 1000
 
+// ---------------------------------------------------------------- key vault (src/lib/vault)
+
+/** How the user wants the secret key locked on this device. */
+export type LockChoice = { method: 'passkey' } | { method: 'password'; password: string } | { method: 'none' }
+export type LockMethod = LockChoice['method']
+
+/** What is stored in KV under "vault". Strings are base64url; `sk` is 64-hex. */
+export type LockedVault =
+  | { v: 1; method: 'passkey'; credId: string; iv: string; ct: string; salt: string }
+  | { v: 1; method: 'password'; ncryptsec: string }
+  | { v: 1; method: 'none'; sk: string }
+
+/** Exported by src/lib/vault/index.ts */
+export interface VaultModule {
+  passkeySupported(): Promise<boolean>
+  lockSecret(secretHex: string, choice: LockChoice, label: string): Promise<LockedVault>
+  unlockSecret(v: LockedVault, password?: string): Promise<string>
+  /** `ksb` = NIP-49 key-security byte (0x00 known insecure, 0x01 default, 0x02 unknown). */
+  toNcryptsec(secretHex: string, password: string, logN?: number, ksb?: 0 | 1 | 2): Promise<string>
+  fromNcryptsec(ncryptsec: string, password: string): Promise<string>
+  /** Key-security byte of a backup without decrypting it; null if not a valid ncryptsec. */
+  ncryptsecKeySecurity?(ncryptsec: string): 0 | 1 | 2 | null
+}
+
+/** Minimum password length for a password lock or a backup. */
+export const MIN_PASSWORD = 8
+
 export interface IlchonState {
-  boot: 'starting' | 'ready' | 'error'
+  /**
+   * 'setup'  = no identity on this profile yet; call createIdentity or restoreIdentity.
+   * 'locked' = identity exists but is locked; call unlock.
+   */
+  boot: 'starting' | 'setup' | 'locked' | 'ready' | 'error'
   bootError?: string
+  lock: {
+    method: LockMethod | null
+    /** Null until checked. */
+    passkeySupported: boolean | null
+    /** The user saved an ncryptsec backup (copied it or confirmed it) at least once. */
+    backedUp: boolean
+    /** The key was moved from the old plaintext storage; ask the user to pick a lock once. */
+    migrated: boolean
+  }
   me: { pubkey: PubkeyHex; npub: string } | null
   relays: RelayStatus[]
   contacts: Contact[]
@@ -378,8 +420,41 @@ export interface IlchonActions {
   markDone(contactId: PubkeyHex, amount: number): Promise<void>
 
   setSettings(patch: Partial<Settings>): Promise<void>
-  /** My secret key as nsec, for backup. */
+  /** My secret key as nsec, for backup. Needs a recent reauth (throws 'reauth-required'). */
   exportKey(): string
+
+  /*
+   * Identity and lock. Failures reject with Error whose message is one of
+   * 'wrong-password' | 'passkey-cancelled' | 'prf-unsupported' |
+   * 'invalid-ncryptsec' | 'weak-password' | 'not-allowed' | 'corrupt' | 'no-vault' |
+   * 'busy' | 'passkey-confirm' (passkey made, tap again to read it) |
+   * 'reauth-required' | 'identity-exists' (another tab made one) | 'unsupported-log-n'.
+   */
+  /** Only in boot 'setup': new key, lock it, then finish boot. */
+  createIdentity(choice: LockChoice): Promise<void>
+  /**
+   * Only in boot 'setup': decrypt the backup now and keep the key in engine
+   * memory, so restoreIdentity can start a passkey ceremony straight from the tap.
+   */
+  checkBackup(ncryptsec: string, password: string): Promise<void>
+  /** Only in boot 'setup': decrypt an ncryptsec backup (reuses checkBackup's result), lock it with `choice`, then finish boot. */
+  restoreIdentity(ncryptsec: string, password: string, choice: LockChoice): Promise<void>
+  /** Only in boot 'locked'. Password is needed for a password lock. */
+  unlock(password?: string): Promise<void>
+  /**
+   * Only in boot 'ready': prove the current lock again (passkey or password).
+   * Opens a short window for changeLock, exportBackup and exportKey.
+   * Method 'none' needs no proof.
+   */
+  reauth(password?: string): Promise<void>
+  /** True while that window is open (always true for method 'none'). */
+  reauthed(): boolean
+  /** Only in boot 'ready': re-lock the key with another method. Needs reauth. */
+  changeLock(choice: LockChoice): Promise<void>
+  /** Only in boot 'ready': ncryptsec of my key. Needs reauth. Does not mark backedUp. */
+  exportBackup(password: string): Promise<string>
+  /** The user copied or confirmed saving the backup: sets lock.backedUp (persisted). */
+  markBackedUp(): Promise<void>
   /** Wipes this profile's local data and reloads. */
   resetAll(): Promise<void>
 }
@@ -394,6 +469,10 @@ export interface EngineDeps {
   namespace: string
   persistence: 'indexeddb' | 'memory'
   now?: () => number
+  /** Key locking. Without it only method 'none' works (Node scripts). */
+  vault?: VaultModule
+  /** Node scripts: a missing identity is created with method 'none' instead of stopping in 'setup'. */
+  autoIdentity?: boolean
 }
 
 /**

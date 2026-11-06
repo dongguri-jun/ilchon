@@ -71,3 +71,20 @@
   padding-left: var(--sp-20);
   list-style: disc;
 }
+.settings__advanced > summary {
+  min-height: var(--h-md);
+  display: flex;
+  align-items: center;
+  color: var(--c-text-dim);
+  cursor: pointer;
+}
+.settings__advanced[open] > summary {
+  margin-bottom: var(--sp-8);
+}
+.settings__warn {
+  margin: 0;
+  padding: var(--sp-8) var(--sp-12);
+  border-radius: var(--radius-sm);
+  background: var(--c-danger-soft);
+  color: var(--c-danger-text);
+}

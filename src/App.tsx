@@ -9,6 +9,10 @@ import { ConnectScreen } from './screens/connect/ConnectScreen'
 import { RoomScreen } from './screens/room/RoomScreen'
 import { SettingsScreen } from './screens/settings/SettingsScreen'
 import { BootError, BootLoader } from './screens/shell/BootScreens'
+import { BackupStep } from './screens/lock/BackupStep'
+import { MigrateStep } from './screens/lock/MigrateStep'
+import { SetupScreen } from './screens/lock/SetupScreen'
+import { UnlockScreen } from './screens/lock/UnlockScreen'
 import { DemoBanner } from './screens/shell/DemoBanner'
 import { IntroCard } from './screens/shell/IntroCard'
 import './screens/shell/strings'
@@ -26,19 +30,32 @@ export default function App() {
   const lang = useIlchon((s) => s.settings.lang)
   const hasContacts = useIlchon((s) => s.contacts.length > 0)
   const matchCount = useIlchon((s) => s.matches.length)
+  const lockMethod = useIlchon((s) => s.lock.method)
+  const backedUp = useIlchon((s) => s.lock.backedUp)
+  const migrated = useIlchon((s) => s.lock.migrated)
 
   const [tab, setTab] = useState<Tab>('board')
   const [overlay, setOverlay] = useState<Overlay>(null)
+  // "Later" on the backup step hides it for this session only; it returns on the next launch.
+  const [backupSnoozed, setBackupSnoozed] = useState(false)
 
   // The stored language wins once the engine has loaded settings.
   useEffect(() => {
-    if (boot !== 'ready') return
+    if (boot !== 'ready' && boot !== 'locked') return
     setLang(lang)
     document.documentElement.lang = lang
   }, [boot, lang])
 
   if (boot === 'starting') return <BootLoader />
   if (boot === 'error') return <BootError message={bootError} />
+  if (boot === 'setup') return <SetupScreen />
+  if (boot === 'locked') return <UnlockScreen />
+  // A key moved from the old plaintext storage: pick a lock once.
+  if (migrated) return <MigrateStep />
+  // Losing a passkey or password loses the key, so ask for a backup until one is saved.
+  if (!backedUp && !backupSnoozed && (lockMethod === 'passkey' || lockMethod === 'password')) {
+    return <BackupStep onClose={() => setBackupSnoozed(true)} />
+  }
 
   const openRoom = (contactId: PubkeyHex) => setOverlay({ kind: 'room', contactId })
   const openConnect = () => setOverlay({ kind: 'connect' })

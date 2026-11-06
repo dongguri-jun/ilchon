@@ -48,6 +48,7 @@ function makePeer(name: string): Peer {
       relays: RELAYS,
       namespace: `e2e:${name}`,
       persistence: 'memory',
+      autoIdentity: true,
     },
     {
       defaultLang: 'en',

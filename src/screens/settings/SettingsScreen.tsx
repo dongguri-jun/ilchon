@@ -2,7 +2,25 @@ import { useState } from 'react'
 import type { Lang } from '../../contracts'
 import { actions, useIlchon } from '../../engine/browser'
 import { useT } from '../../i18n'
-import { AppBar, Badge, Button, Card, Dialog, IconCopy, IconLock, IconTrash, Segmented, Switch, useToast } from '../../ui'
+import {
+  AppBar,
+  Badge,
+  BottomSheet,
+  Button,
+  Card,
+  Dialog,
+  IconCopy,
+  IconLock,
+  IconTrash,
+  IconWarning,
+  Segmented,
+  Switch,
+  useToast,
+} from '../../ui'
+import { BackupPanel } from '../lock/BackupPanel'
+import { LockChooser } from '../lock/LockChooser'
+import { ReauthGate } from '../lock/ReauthGate'
+import { copyText } from '../lock/util'
 import './strings'
 import './settings.css'
 
@@ -11,32 +29,8 @@ const LANG_OPTIONS: { value: Lang; label: string }[] = [
   { value: 'en', label: 'English' },
 ]
 
-/** Clipboard write that also works where the async API is missing. */
-async function copyText(text: string): Promise<boolean> {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text)
-      return true
-    }
-  } catch {
-    // fall through to the legacy path
-  }
-  try {
-    const el = document.createElement('textarea')
-    el.value = text
-    el.setAttribute('readonly', '')
-    el.setAttribute('aria-hidden', 'true')
-    el.style.position = 'fixed'
-    el.style.top = '-1000px'
-    el.style.opacity = '0'
-    document.body.appendChild(el)
-    el.select()
-    const ok = document.execCommand('copy')
-    el.remove()
-    return ok
-  } catch {
-    return false
-  }
+function methodKey(m: 'passkey' | 'password' | 'none' | null): string {
+  return m === 'passkey' ? 'lockPasskey' : m === 'password' ? 'lockPassword' : m === 'none' ? 'lockNone' : 'lockUnknown'
 }
 
 function shortNpub(npub: string): string {
@@ -53,6 +47,10 @@ export function SettingsScreen() {
   const settings = useIlchon((s) => s.settings)
   const relays = useIlchon((s) => s.relays)
   const npub = useIlchon((s) => s.me?.npub ?? '')
+  const lock = useIlchon((s) => s.lock)
+
+  const [lockSheet, setLockSheet] = useState(false)
+  const [backupSheet, setBackupSheet] = useState(false)
 
   const [backupOpen, setBackupOpen] = useState(false)
   const [resetOpen, setResetOpen] = useState(false)
@@ -65,14 +63,15 @@ export function SettingsScreen() {
   }
 
   const confirmBackup = async () => {
-    setBackupOpen(false)
     let ok = false
     try {
-      // The key goes straight to the clipboard; it is never put in state or the DOM tree.
-      ok = await copyText(actions.exportKey())
+      // The key goes straight to the clipboard; it is never put in state or the DOM tree
+      // (no textarea fallback: without the async clipboard API the copy just fails).
+      ok = await copyText(actions.exportKey(), { legacy: false })
     } catch {
       ok = false
     }
+    if (ok) setBackupOpen(false)
     toast.show(ok ? t('backupDone') : t('copyFailed'), ok ? 'success' : 'error')
   }
 
@@ -154,13 +153,51 @@ export function SettingsScreen() {
                 {t('copy')}
               </Button>
             </div>
+          </Card>
+        </section>
+
+        <section className="settings__section">
+          <h2 className="settings__heading">{t('secProtect')}</h2>
+          <Card>
+            <div className="settings__toggle">
+              <div className="ui-grow">
+                <div className="t-caption t-dim">{t('lockMethod')}</div>
+                <div className="t-body1 t-bold">{t(methodKey(lock?.method ?? null))}</div>
+              </div>
+              {lock?.method === 'none' && <Badge tone="danger">{t('lockNoneBadge')}</Badge>}
+            </div>
             <div className="settings__divider" />
             <div className="settings__action">
-              <Button variant="secondary" fullWidth leading={<IconLock size={18} />} onClick={() => setBackupOpen(true)}>
-                {t('backup')}
+              <Button variant="secondary" fullWidth leading={<IconLock size={18} />} onClick={() => setLockSheet(true)}>
+                {t('lockChange')}
               </Button>
-              <p className="t-caption t-dim">{t('backupHelp')}</p>
             </div>
+            <div className="settings__divider" />
+            <div className="settings__action">
+              <div className="settings__toggle">
+                <span className="t-body1 ui-grow">{t('backupNcrypt')}</span>
+                {lock && !lock.backedUp && (
+                  <Badge tone="warning" icon={<IconWarning size={14} />}>
+                    {t('noBackup')}
+                  </Badge>
+                )}
+              </div>
+              <Button variant="secondary" fullWidth onClick={() => setBackupSheet(true)}>
+                {t('backupMake')}
+              </Button>
+              <p className="t-caption t-dim">{t('backupNcryptHelp')}</p>
+            </div>
+            <div className="settings__divider" />
+            <details className="settings__advanced">
+              <summary className="t-body2">{t('advanced')}</summary>
+              <div className="settings__action">
+                <p className="settings__warn t-caption">{t('advancedWarn')}</p>
+                <Button variant="danger" fullWidth leading={<IconCopy size={18} />} onClick={() => setBackupOpen(true)}>
+                  {t('backup')}
+                </Button>
+                <p className="t-caption t-dim">{t('backupHelp')}</p>
+              </div>
+            </details>
           </Card>
         </section>
 
@@ -204,15 +241,44 @@ export function SettingsScreen() {
         </section>
       </div>
 
-      <Dialog
-        open={backupOpen}
-        title={t('backupTitle')}
-        confirmLabel={t('backupConfirm')}
-        onConfirm={() => void confirmBackup()}
-        onCancel={() => setBackupOpen(false)}
-      >
-        {t('backupBody')}
-      </Dialog>
+      {/* Raw key, password lock change and ncryptsec export all prove the current lock first. */}
+      <BottomSheet open={backupOpen} onClose={() => setBackupOpen(false)} title={t('backupTitle')}>
+        {backupOpen && (
+          <ReauthGate>
+            <div className="ui-stack">
+              <p className="t-body2">{t('backupBody')}</p>
+              <Button variant="danger" fullWidth leading={<IconCopy size={18} />} onClick={() => void confirmBackup()}>
+                {t('backupConfirm')}
+              </Button>
+            </div>
+          </ReauthGate>
+        )}
+      </BottomSheet>
+
+      <BottomSheet open={lockSheet} onClose={() => setLockSheet(false)} title={t('lockChange')}>
+        {lockSheet && (
+          <ReauthGate>
+            <LockChooser
+              passkeySupported={lock?.passkeySupported ?? null}
+              current={lock?.method ?? null}
+              submitLabel={t('lockSave')}
+              onSubmit={async (choice) => {
+                await actions.changeLock(choice)
+                setLockSheet(false)
+                toast.show(t('lockChanged'), 'success')
+              }}
+            />
+          </ReauthGate>
+        )}
+      </BottomSheet>
+
+      <BottomSheet open={backupSheet} onClose={() => setBackupSheet(false)} title={t('backupNcrypt')}>
+        {backupSheet && (
+          <ReauthGate>
+            <BackupPanel onDone={() => setBackupSheet(false)} />
+          </ReauthGate>
+        )}
+      </BottomSheet>
 
       <Dialog
         open={resetOpen}

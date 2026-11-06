@@ -27,6 +27,9 @@ import {
   type IncomingInvite,
   type IncomingMessage,
   type Lang,
+  type LockChoice,
+  type LockedVault,
+  MIN_PASSWORD,
   type Match,
   type Offer,
   type OfferInput,
@@ -63,6 +66,8 @@ const CHAT_MAX = 2000
 const NAME_MAX = 40
 /** Demo mode only: how often a refused round is tried again once the window passed. */
 const MX_RETRIES = 2
+/** How long a reauth (or a fresh unlock/create) lets changeLock, exportBackup and exportKey run. */
+const REAUTH_MS = 5 * 60_000
 
 // ---------------------------------------------------------------- public extras
 
@@ -71,6 +76,11 @@ export interface EngineHooks {
   defaultLang?: Lang
   /** Runs at the end of resetAll, after local data is gone. The browser reloads here. */
   onReset?: () => void | Promise<void>
+  /**
+   * Another tab of this profile wrote or wiped the identity. The browser reloads
+   * here. Without it no cross-tab channel is opened (Node scripts).
+   */
+  onExternalChange?: () => void
   /** Diagnostics. Never receives keys, labels or offer contents. */
   debug?: (event: string, info?: Record<string, string | number | boolean>) => void
 }
@@ -196,13 +206,31 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     rooms: {},
     connect: { phase: 'idle' },
     rates: {},
+    lock: { method: null, passkeySupported: null, backedUp: false, migrated: false },
     // Demo mode weakens the one-round-per-day limit, so it is opt-in (Settings or ?demo=1).
     settings: { lang: hooks.defaultLang ?? 'ko', sort: 'amount', demoMode: false },
   }))
   const get = store.getState
   const set = (patch: Partial<IlchonState>) => store.setState(patch)
 
+  /** The secret key. Lives only in memory, and only after unlock. */
   let sk = ''
+  /** The locked key as stored in KV under 'vault'. */
+  let vaultRec: LockedVault | null = null
+  /** An identity action (create, restore, unlock, change lock) is running. */
+  let identityBusy = false
+  /** Until when a sensitive action may run without proving the lock again. */
+  let reauthUntil = 0
+  /** checkBackup's result, so restoreIdentity can start WebAuthn straight from the tap. */
+  let pendingRestore: { text: string; password: string; secret: string } | null = null
+  /** NIP-49 key-security byte for exported backups (0 once the key sat unencrypted). */
+  let ksb: 0 | 1 | 2 = 1
+  /** Tells other tabs of this profile that the identity changed. Browser only. */
+  const channel: BroadcastChannel | null =
+    hooks.onExternalChange && typeof BroadcastChannel !== 'undefined'
+      ? new BroadcastChannel(`ilchon-identity:${deps.namespace}`)
+      : null
+  if (channel) channel.onmessage = () => hooks.onExternalChange?.()
   let me: PubkeyHex = ''
   let transport: Transport | null = null
   /** No more network or timers. */
@@ -1129,7 +1157,230 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
 
   function exportKey(): string {
     if (!sk) throw new Error('not_ready')
+    if (!reauthOk()) throw new Error('reauth-required')
     return marmot.nsecOf(sk)
+  }
+
+  // ============================================================== 5b. identity and lock
+
+  const HEX64 = /^[0-9a-f]{64}$/
+
+  /** KV write outside the snapshot table, ordered with the other writes. Rejects on failure. */
+  function writeNow(key: string, value: unknown): Promise<void> {
+    const p = writeChain.then(async () => {
+      if (frozen) return
+      await kv.set(key, value)
+    })
+    writeChain = p.catch(() => {})
+    return p
+  }
+
+  function delNow(key: string): Promise<void> {
+    const p = writeChain.then(async () => {
+      if (frozen) return
+      await kv.del(key)
+    })
+    writeChain = p.catch(() => {})
+    return p
+  }
+
+  function announce(): void {
+    try {
+      channel?.postMessage('identity')
+    } catch {
+      // closed
+    }
+  }
+
+  /** Only ever lowers the backup's key-security claim: 0 (insecure) wins, then 2 (unknown). */
+  async function degradeKsb(n: 0 | 1 | 2): Promise<void> {
+    const next: 0 | 1 | 2 = n === 0 || ksb === 0 ? 0 : n === 2 || ksb === 2 ? 2 : 1
+    if (next === ksb) return
+    ksb = next
+    await writeNow('ksb', next)
+  }
+
+  function reauthOk(): boolean {
+    return vaultRec?.method === 'none' || now() < reauthUntil
+  }
+
+  /** Serialises identity writes across tabs of this profile (Web Locks where present). */
+  function identityLock<T>(fn: () => Promise<T>): Promise<T> {
+    const locks = (globalThis as { navigator?: { locks?: LockManager } }).navigator?.locks
+    if (!locks?.request) return fn()
+    return locks.request(`ilchon-identity:${deps.namespace}`, fn) as Promise<T>
+  }
+
+  /** Stores a brand-new identity unless another tab stored one first. */
+  async function storeFirstVault(v: LockedVault): Promise<void> {
+    await identityLock(async () => {
+      if ((await kv.get<LockedVault>('vault')) != null) throw new Error('identity-exists')
+      await storeVault(v)
+    })
+  }
+
+  function setLock(patch: Partial<IlchonState['lock']>): void {
+    set({ lock: { ...get().lock, ...patch } })
+  }
+
+  function checkChoice(choice: LockChoice): void {
+    if (!choice || (choice.method !== 'passkey' && choice.method !== 'password' && choice.method !== 'none')) {
+      throw new Error('invalid-choice')
+    }
+    if (choice.method === 'password' && (typeof choice.password !== 'string' || choice.password.length < MIN_PASSWORD)) {
+      throw new Error('weak-password')
+    }
+  }
+
+  async function lockWith(secret: string, choice: LockChoice): Promise<LockedVault> {
+    if (choice.method === 'none') return { v: 1, method: 'none', sk: secret }
+    if (!deps.vault) throw new Error('no-vault')
+    const label = `ilchon ${marmot.npubOf(marmot.pubkeyOf(secret)).slice(0, 16)}`
+    return deps.vault.lockSecret(secret, choice, label)
+  }
+
+  async function storeVault(v: LockedVault): Promise<void> {
+    await writeNow('vault', v)
+    vaultRec = v
+    if (v.method === 'none') await degradeKsb(0)
+    // A plaintext key from before the vault must never outlive it.
+    await delNow('sk').catch(() => {})
+    if (get().lock.migrated) await delNow('migrated').catch(() => {})
+    setLock({ method: v.method, migrated: false })
+    announce()
+  }
+
+  /** Runs `fn` unless another identity action is in flight. */
+  async function exclusive<T>(phase: IlchonState['boot'], fn: () => Promise<T>): Promise<T> {
+    if (get().boot !== phase) throw new Error('not-allowed')
+    if (identityBusy) throw new Error('busy')
+    identityBusy = true
+    try {
+      return await fn()
+    } finally {
+      identityBusy = false
+    }
+  }
+
+  /** A key made for createIdentity whose lock failed; reused so a passkey retry keeps its label. */
+  let pendingNew = ''
+
+  function createIdentity(choice: LockChoice): Promise<void> {
+    return exclusive('setup', async () => {
+      checkChoice(choice)
+      // Nothing may await before lockWith: a passkey create() needs the tap's user activation.
+      const secret = (pendingNew ||= marmot.generateSecretKeyHex())
+      const locked = await lockWith(secret, choice)
+      await storeFirstVault(locked)
+      pendingNew = ''
+      reauthUntil = now() + REAUTH_MS
+      await openIdentity(secret)
+    })
+  }
+
+  function backupText(ncryptsec: unknown): string {
+    const text = typeof ncryptsec === 'string' ? ncryptsec.trim() : ''
+    if (!text) throw new Error('invalid-ncryptsec')
+    return text
+  }
+
+  function checkBackup(ncryptsec: string, password: string): Promise<void> {
+    return exclusive('setup', async () => {
+      if (!deps.vault) throw new Error('no-vault')
+      const text = backupText(ncryptsec)
+      pendingRestore = null
+      const secret = await deps.vault.fromNcryptsec(text, password ?? '')
+      if (!HEX64.test(secret)) throw new Error('invalid-ncryptsec')
+      pendingRestore = { text, password: password ?? '', secret }
+    })
+  }
+
+  function restoreIdentity(ncryptsec: string, password: string, choice: LockChoice): Promise<void> {
+    return exclusive('setup', async () => {
+      checkChoice(choice)
+      if (!deps.vault) throw new Error('no-vault')
+      const text = backupText(ncryptsec)
+      const p = pendingRestore
+      let secret: string
+      if (p && p.text === text && p.password === (password ?? '')) {
+        // Decrypted on the previous step: the passkey ceremony starts from this tap.
+        secret = p.secret
+      } else {
+        secret = await deps.vault.fromNcryptsec(text, password ?? '')
+        if (!HEX64.test(secret)) throw new Error('invalid-ncryptsec')
+      }
+      const locked = await lockWith(secret, choice)
+      await storeFirstVault(locked)
+      pendingRestore = null
+      const backupKsb = deps.vault.ncryptsecKeySecurity?.(text)
+      if (backupKsb === 0 || backupKsb === 2) await degradeKsb(backupKsb)
+      // The user holds a backup of this key already.
+      await writeNow('backedUp', true)
+      setLock({ backedUp: true })
+      reauthUntil = now() + REAUTH_MS
+      await openIdentity(secret)
+    })
+  }
+
+  function unlock(password?: string): Promise<void> {
+    return exclusive('locked', async () => {
+      const v = vaultRec
+      if (!v) throw new Error('corrupt')
+      let secret: string
+      if (v.method === 'none') secret = v.sk
+      else {
+        if (!deps.vault) throw new Error('no-vault')
+        if (v.method === 'password' && !password) throw new Error('wrong-password')
+        secret = await deps.vault.unlockSecret(v, password)
+      }
+      if (!HEX64.test(secret)) throw new Error('corrupt')
+      reauthUntil = now() + REAUTH_MS
+      await openIdentity(secret)
+    })
+  }
+
+  /** Proves the current lock again. The passkey get() runs straight from the tap. */
+  function reauth(password?: string): Promise<void> {
+    return exclusive('ready', async () => {
+      const v = vaultRec
+      if (!v || !sk) throw new Error('not-allowed')
+      if (v.method !== 'none') {
+        if (!deps.vault) throw new Error('no-vault')
+        if (v.method === 'password' && !password) throw new Error('wrong-password')
+        const got = await deps.vault.unlockSecret(v, password)
+        if (got !== sk) throw new Error(v.method === 'password' ? 'wrong-password' : 'corrupt')
+      }
+      reauthUntil = now() + REAUTH_MS
+    })
+  }
+
+  function reauthed(): boolean {
+    return get().boot === 'ready' && !!sk && reauthOk()
+  }
+
+  function changeLock(choice: LockChoice): Promise<void> {
+    return exclusive('ready', async () => {
+      checkChoice(choice)
+      if (!sk) throw new Error('not-allowed')
+      if (!reauthOk()) throw new Error('reauth-required')
+      await storeVault(await lockWith(sk, choice))
+      reauthUntil = now() + REAUTH_MS
+    })
+  }
+
+  async function exportBackup(password: string): Promise<string> {
+    if (get().boot !== 'ready' || !sk) throw new Error('not-allowed')
+    if (!reauthOk()) throw new Error('reauth-required')
+    if (typeof password !== 'string' || password.length < MIN_PASSWORD) throw new Error('weak-password')
+    if (!deps.vault) throw new Error('no-vault')
+    // backedUp is set only once the user copies or confirms it (markBackedUp).
+    return deps.vault.toNcryptsec(sk, password, 16, ksb)
+  }
+
+  async function markBackedUp(): Promise<void> {
+    if (get().boot !== 'ready' || !sk) throw new Error('not-allowed')
+    await writeNow('backedUp', true)
+    setLock({ backedUp: true })
   }
 
   // ============================================================== 6. incoming, boot, stop, reset
@@ -1190,18 +1441,92 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   let stopRates: (() => void) | undefined
   let starting: Promise<void> | null = null
 
+  let passkeyChecked = false
+
+  /**
+   * Loads stored data and the locked key. Stops in 'setup' (no identity yet)
+   * or 'locked' (waiting for unlock); otherwise continues into openIdentity.
+   */
   async function boot(): Promise<void> {
     stopped = false
     set({ boot: 'starting', bootError: undefined })
+    if (!passkeyChecked) {
+      passkeyChecked = true
+      const v = deps.vault
+      if (!v) setLock({ passkeySupported: false })
+      else
+        void v
+          .passkeySupported()
+          .catch(() => false)
+          .then((ok) => setLock({ passkeySupported: ok }))
+    }
+    let secret = ''
     try {
-      let stored = await kv.get<string>('sk')
-      if (!stored) {
-        stored = marmot.generateSecretKeyHex()
-        await kv.set('sk', stored)
-      }
-      sk = stored
-      me = marmot.pubkeyOf(sk)
       await load()
+      setLock({
+        backedUp: (await kv.get<boolean>('backedUp')) === true,
+        migrated: (await kv.get<boolean>('migrated')) === true,
+      })
+      const storedKsb = await kv.get<number>('ksb')
+      ksb = storedKsb === 0 || storedKsb === 2 ? storedKsb : 1
+
+      let stored = (await kv.get<LockedVault>('vault')) ?? null
+      if (stored) {
+        // A legacy plaintext key left behind by an interrupted migration.
+        try {
+          if ((await kv.get<string>('sk')) !== undefined) await kv.del('sk')
+        } catch {
+          debug('sk-cleanup-failed')
+        }
+      } else {
+        // Before the vault existed the key sat in KV as plain hex.
+        const legacy = await kv.get<string>('sk')
+        if (legacy) {
+          stored = { v: 1, method: 'none', sk: legacy }
+          // The user never chose 'none': the app asks once for a lock and a backup.
+          await writeNow('migrated', true)
+          await writeNow('ksb', 0)
+          ksb = 0
+          setLock({ migrated: true })
+          await writeNow('vault', stored)
+          await delNow('sk').catch(() => debug('sk-cleanup-failed'))
+        } else if (deps.autoIdentity) {
+          stored = { v: 1, method: 'none', sk: marmot.generateSecretKeyHex() }
+          await writeNow('vault', stored)
+        }
+      }
+      vaultRec = stored
+      setLock({ method: stored?.method ?? null })
+      if (!stored) {
+        set({ boot: 'setup' })
+        return
+      }
+      if (stored.method !== 'none') {
+        set({ boot: 'locked' })
+        return
+      }
+      if (!HEX64.test(stored.sk)) throw new Error('corrupt')
+      secret = stored.sk
+    } catch (e) {
+      return fail(e)
+    }
+    await openIdentity(secret)
+  }
+
+  async function fail(e: unknown): Promise<never> {
+    await shutdown()
+    set({ boot: 'error', bootError: e instanceof Error ? e.message : String(e) })
+    starting = null
+    throw e
+  }
+
+  /** The rest of boot once the secret key is in memory: transport, listeners, start. */
+  async function openIdentity(secret: string): Promise<void> {
+    stopped = false
+    set({ boot: 'starting', bootError: undefined })
+    try {
+      sk = secret
+      me = marmot.pubkeyOf(sk)
       set({ me: { pubkey: me, npub: marmot.npubOf(me) } })
 
       const t = marmot.createTransport({
@@ -1227,10 +1552,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
       set({ boot: 'ready', relays: t.relayStatus() })
       debug('ready', { me: short(me) })
     } catch (e) {
-      await shutdown()
-      set({ boot: 'error', bootError: e instanceof Error ? e.message : String(e) })
-      starting = null
-      throw e
+      return fail(e)
     }
   }
 
@@ -1259,11 +1581,19 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     frozen = true
     await shutdown()
     await writeChain.catch(() => {})
+    sk = ''
+    vaultRec = null
+    pendingRestore = null
+    pendingNew = ''
+    reauthUntil = 0
     try {
-      for (const key of await kv.keys()) await kv.del(key)
+      await identityLock(async () => {
+        for (const key of await kv.keys()) await kv.del(key)
+      })
     } catch {
       debug('reset-failed')
     }
+    announce()
     await hooks.onReset?.()
   }
 
@@ -1281,6 +1611,15 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     setSettings,
     exportKey,
     resetAll,
+    createIdentity,
+    checkBackup,
+    restoreIdentity,
+    unlock,
+    reauth,
+    reauthed,
+    changeLock,
+    exportBackup,
+    markBackedUp,
   }
 
   return {
@@ -1288,6 +1627,7 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     actions,
     start: () => (starting ??= boot()),
     async stop() {
+      channel?.close()
       await shutdown()
       await writeChain.catch(() => {})
       starting = null

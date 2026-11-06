@@ -4,6 +4,7 @@ import './ui/tokens.css'
 import { ToastProvider } from './ui'
 import { bootEngine } from './engine/browser'
 import App from './App'
+import { requestPersistence } from './lib/pwa'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -18,3 +19,5 @@ createRoot(document.getElementById('root')!).render(
 void Promise.resolve()
   .then(() => bootEngine())
   .catch(() => undefined)
+
+void requestPersistence()

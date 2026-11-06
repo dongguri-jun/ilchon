@@ -9,6 +9,7 @@ import {
   type IlchonActions,
   type IlchonState,
   type MarmotModule,
+  type VaultModule,
 } from '../contracts'
 import { getLang, setLang } from '../i18n'
 import * as connectModule from '../lib/connect'
@@ -17,11 +18,13 @@ import * as marmotModule from '../lib/marmot'
 import { matchCrypto } from '../lib/match'
 import { getProfileNamespace } from '../lib/profile'
 import { createRatesSource } from '../lib/rates'
+import * as vaultModule from '../lib/vault'
 import { createEngine, transportNamespace } from './index'
 
 const namespace = getProfileNamespace()
 const marmot: MarmotModule = marmotModule
 const connect: ConnectModule = connectModule
+const vault: VaultModule = vaultModule
 
 /** True when a storage name belongs to this profile and not to one whose name merely starts the same. */
 function ownedByProfile(name: string): boolean {
@@ -75,6 +78,7 @@ export const engine = createEngine(
     relays: DEFAULT_RELAYS,
     namespace,
     persistence: 'indexeddb',
+    vault,
   },
   {
     defaultLang: getLang(),
@@ -83,6 +87,10 @@ export const engine = createEngine(
       // Named deletion first: indexedDB.databases() is missing in some browsers.
       if (pubkey) await marmotModule.purgeMarmotStorage(transportNamespace(namespace, pubkey), pubkey).catch(() => {})
       await wipeProfileStores()
+      location.reload()
+    },
+    onExternalChange() {
+      // Another tab created, re-locked or wiped this profile's identity.
       location.reload()
     },
     debug: import.meta.env.DEV ? (event, info) => console.debug('[ilchon]', event, info ?? '') : undefined,
@@ -97,6 +105,24 @@ engine.store.subscribe((s, prev) => {
 })
 
 let booting: Promise<void> | null = null
+
+/** After this long in the background a locked identity is locked again (by reloading). */
+const RELOCK_AFTER_MS = 5 * 60_000
+
+if (typeof document !== 'undefined') {
+  let hiddenAt = 0
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      hiddenAt = Date.now()
+      return
+    }
+    const s = engine.store.getState()
+    if (hiddenAt && Date.now() - hiddenAt > RELOCK_AFTER_MS && s.boot === 'ready' && s.lock.method && s.lock.method !== 'none') {
+      location.reload()
+    }
+    hiddenAt = 0
+  })
+}
 
 /** `?demo=1` turns demo mode on for this profile (stage devices), `?demo=0` off. */
 function demoFlag(): boolean | undefined {

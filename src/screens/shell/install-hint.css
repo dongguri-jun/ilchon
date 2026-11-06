@@ -1,0 +1,14 @@
+.install-hint {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  align-items: flex-start;
+  padding: var(--sp-12) var(--sp-16);
+  border-radius: var(--radius-md);
+  background: var(--c-info-soft);
+  color: var(--c-text);
+  font-size: var(--fs-14);
+}
+.install-hint--compact { padding: var(--sp-8) var(--sp-12); gap: var(--sp-4); }
+.install-hint p { margin: 0; }
+.install-hint__warn { color: var(--c-warning); }
