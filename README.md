@@ -46,7 +46,7 @@ The comparison uses commutative blinding over **ristretto255** with fresh secret
 2. `m2` responder → initiator: `q = H(label_r)^b` and `pq = SHA-256(p^b)` — a hash commitment, never the point itself, so the initiator cannot echo it back to fake a match
 3. `m3` initiator → responder: `qp = q^a`
 
-The initiator compares `SHA-256(q^a)` against `pq`; the responder compares `SHA-256(qp)` against the commitment it kept (hashes are domain-tagged, label fields length-prefixed, points rejected if malformed or identity). Blinding commutes, so equal labels give equal values, and neither side learns the other's label. Only after both sides verify a match does each send its `offer` (amount and premium). A responder answers one round per contact per 24 hours (20 s in demo mode).
+The initiator compares `SHA-256(q^a)` against `pq`; the responder compares `SHA-256(qp)` against the commitment it kept (hashes are domain-tagged, label fields length-prefixed, points rejected if malformed or identity). Blinding commutes, so equal labels give equal values, and neither side learns the other's label. Only after both sides verify a match does each send its `offer` (amount and premium). A responder answers one round per contact per 24 hours (8 s in demo mode).
 
 Code: `src/lib/match/`, wire format in `src/contracts.ts`.
 
@@ -136,7 +136,7 @@ pnpm i
 pnpm dev
 ```
 
-Open several profiles in one browser with `?p=<name>`; each name has its own key and storage. `demo=1` shortens the one-round-per-day limit to 20 seconds:
+Open several profiles in one browser with `?p=<name>`; each name has its own key and storage. `demo=1` shortens the one-round-per-day limit to 8 s:
 
 ```
 http://localhost:5173/?p=a&demo=1

@@ -1185,11 +1185,10 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
   }
 
   const deferTimers = new Map<PubkeyHex, number>()
-  /** Slack after the window, so the peer's own window (spent a moment after mine) has passed too. */
-  const DEFER_SLACK_MS = 5_000
-
   /** Start this round once the window passed. Kept across reloads (see armDeferred). */
   function armDeferred(pk: PubkeyHex, d: DeferredRound, at: number): void {
+    // Let the peer's window (spent a moment after mine) expire too.
+    const DEFER_SLACK_MS = get().settings.demoMode ? 2_000 : 5_000
     cancel(deferTimers.get(pk))
     deferTimers.set(
       pk,

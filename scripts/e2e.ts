@@ -26,7 +26,7 @@ const BOOT_MS = 90_000
 const LINK_MS = 110_000
 const ROUND_MS = 60_000
 /** Longer than the demo answer window plus one retry, so a late match would show up. */
-const SETTLE_MS = 30_000
+const SETTLE_MS = 15_000
 
 interface Peer {
   name: string
@@ -179,7 +179,7 @@ async function main(): Promise<void> {
   )
   if (!bootOk) return
   // One match round per contact per window, in either role. The scenario re-matches
-  // the same pairs within minutes, so it runs with the 20 s demo window; the
+  // the same pairs within minutes, so it runs with the 8 s demo window; the
   // engines defer a blocked round until the window passed.
   await Promise.all(peers.map((p) => p.engine.actions.setSettings({ demoMode: true })))
 

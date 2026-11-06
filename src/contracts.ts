@@ -334,13 +334,13 @@ export interface Settings {
   sort: SortMode
   /**
    * Hackathon demo mode. Shortens the "answer one match round per contact"
-   * window from 24 h to 20 s so a live demo can re-post offers.
+   * window from 24 h to 8 s so a live demo can re-post offers.
    */
   demoMode: boolean
 }
 
 export const RESPOND_WINDOW_MS = 24 * 60 * 60 * 1000
-export const RESPOND_WINDOW_DEMO_MS = 20 * 1000
+export const RESPOND_WINDOW_DEMO_MS = 8 * 1000
 
 // ---------------------------------------------------------------- key vault (src/lib/vault)
 

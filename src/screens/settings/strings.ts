@@ -7,7 +7,7 @@ registerStrings('settings', {
     secGeneral: '일반',
     language: '언어',
     demoMode: '시연 모드',
-    demoModeHelp: '일촌 한 명당 매칭 응답을 24시간에 한 번이 아니라 20초에 한 번 해요.',
+    demoModeHelp: '일촌 한 명당 매칭 응답을 24시간에 한 번이 아니라 8초에 한 번 해요.',
 
     secRelays: '릴레이 연결',
     relayOn: '연결됨',
@@ -71,7 +71,7 @@ registerStrings('settings', {
     secGeneral: 'General',
     language: 'Language',
     demoMode: 'Demo mode',
-    demoModeHelp: 'Answers one match round per contact every 20 s instead of once per 24 h.',
+    demoModeHelp: 'Answers one match round per contact every 8 s instead of once per 24 h.',
 
     secRelays: 'Relay connections',
     relayOn: 'Connected',
