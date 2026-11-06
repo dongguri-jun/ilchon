@@ -110,6 +110,12 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
     }
   }
 
+  /** Put a ready-made message in the composer; the user edits it before sending. */
+  function insert(text: string) {
+    setDraft((d) => (d.trim() ? `${d.trimEnd()} ${text}` : text))
+    composerRef.current?.focus()
+  }
+
   async function send() {
     const text = draft.trim()
     if (!text || sending) return
@@ -140,6 +146,16 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
           ) : undefined
         }
       />
+
+      {myOffer && (
+        <div className={cx('room__role', `room__role--${myOffer.side}`)} role="status">
+          <span className="room__role-me">{t(myOffer.side === 'buy' ? 'roleBuyer' : 'roleSeller')}</span>
+          {theirOffer && tradable !== null && <span className="room__role-peer">
+            {t(myOffer.side === 'buy' ? 'peerSeller' : 'peerBuyer', { name })}
+            {' · '}<span className="num">{t('tradableShort', { amount: formatMoney(tradable, myOffer.currency) })}</span>
+          </span>}
+        </div>
+      )}
 
       <div className="room__summary">
         <Card padding="sm">
@@ -194,12 +210,18 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
       </div>
 
       <div className="room__composer">
-        {/* The buyer sends the invoice; the seller only receives one. */}
-        {myOffer?.side !== 'sell' && <div className="room__shortcuts">
-          <Chip icon={<IconCopy size={16} />} onClick={() => void paste()}>
+        {/* Role-specific shortcuts: the buyer sends an invoice and asks for the
+            account; the seller shares the account and asks for an invoice. */}
+        <div className="room__shortcuts">
+          {myOffer?.side !== 'sell' && <Chip icon={<IconCopy size={16} />} onClick={() => void paste()}>
             {t('pasteInvoice')}
-          </Chip>
-        </div>}
+          </Chip>}
+          {myOffer?.side === 'buy' && <Chip onClick={() => insert(t('msgAskAccount'))}>{t('chipAskAccount')}</Chip>}
+          {myOffer?.side === 'sell' && <>
+            <Chip onClick={() => insert(t('msgSendAccount'))}>{t('chipSendAccount')}</Chip>
+            <Chip onClick={() => insert(t('msgAskInvoice'))}>{t('chipAskInvoice')}</Chip>
+          </>}
+        </div>
         <div className="room__input-row">
           <TextField
             inputRef={composerRef}

@@ -272,3 +272,12 @@
 .room .ui-appbar__side--right .ui-btn { min-height: 44px; }
 .room__ln-copy, .room__status--failed { min-height: 44px; }
 .room__composer .ui-field__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+/* Who I am in this trade, always visible above the guide and chat. */
+.room__role { flex: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-4) var(--sp-12); margin: var(--sp-8) var(--sp-16) 0; padding: 10px var(--sp-16); border-radius: var(--radius-md, 12px); border: 1px solid var(--c-border); background: var(--c-surface-2); }
+.room__role-me { font-size: var(--fs-18, 18px); font-weight: 700; }
+.room__role-peer { font-size: var(--fs-14); color: var(--c-text-dim); }
+.room__role--sell { border-color: var(--c-brand); }
+.room__role--sell .room__role-me { color: var(--c-brand); }
+.room__role--buy .room__role-me { color: var(--c-text); }
+.room__shortcuts { flex-wrap: wrap; }
