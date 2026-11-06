@@ -194,11 +194,12 @@ export function RoomScreen({ contactId, onBack }: RoomScreenProps) {
       </div>
 
       <div className="room__composer">
-        <div className="room__shortcuts">
+        {/* The buyer sends the invoice; the seller only receives one. */}
+        {myOffer?.side !== 'sell' && <div className="room__shortcuts">
           <Chip icon={<IconCopy size={16} />} onClick={() => void paste()}>
             {t('pasteInvoice')}
           </Chip>
-        </div>
+        </div>}
         <div className="room__input-row">
           <TextField
             inputRef={composerRef}

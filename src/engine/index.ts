@@ -1446,8 +1446,11 @@ export function createEngine(deps: EngineDeps, hooks: EngineHooks = {}): IlchonE
     const next: Match = { contactId: from, offer: theirs, matchedAt: prev?.matchedAt ?? now() }
     set({ matches: prev ? matches.map((x) => (x === prev ? next : x)) : [...matches, next] })
     void save('matches')
-    if (!prev) {
-      debug('match', { peer: short(from) })
+    // A re-match right after the last one (nothing said since) needs no second notice.
+    const last = get().rooms[from]?.at(-1)
+    const repeat = last?.kind === 'system' && (last.text === systemText.matched('ko') || last.text === systemText.matched('en'))
+    if (!prev) debug('match', { peer: short(from) })
+    if (!prev && !repeat) {
       addRoomMessage({
         id: randomId(),
         contactId: from,
