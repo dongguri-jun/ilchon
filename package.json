@@ -7,8 +7,13 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:match": "tsx scripts/check-match.ts",
+    "check:vault": "tsx scripts/check-vault.ts",
+    "check": "pnpm typecheck && pnpm check:match && pnpm check:vault",
+    "e2e": "tsx scripts/e2e.ts"
   },
+  "packageManager": "pnpm@11.9.0",
   "dependencies": {
     "@internet-privacy/marmot-ts": "0.9.0",
     "@noble/ciphers": "^2.4.0",
