@@ -10,6 +10,18 @@ pin="$(sed -n 's/.*"flutter" *: *"\([^"]*\)".*/\1/p' .fvmrc)"
 fvm_dart="${FVM_CACHE_PATH:-$HOME/fvm}/versions/$pin/bin/cache/dart-sdk/bin/dart"
 if [ -n "${ILCHON_DART:-}" ]; then DART="$ILCHON_DART"; elif [ -x "$fvm_dart" ]; then DART="$fvm_dart"; else DART=dart; fi
 
+# The pinned Dart and a Chrome for the browser step must exist; say what is missing instead of failing in the middle.
+if ! "$DART" --version >/dev/null 2>&1; then
+  echo "check:dart: no Dart SDK. Install Flutter $pin with fvm, or set ILCHON_DART to its bin/cache/dart-sdk/bin/dart." >&2
+  exit 127
+fi
+chrome="${CHROME_EXECUTABLE:-}"
+if [ -z "$chrome" ]; then chrome="$(command -v google-chrome chromium chromium-browser chrome 2>/dev/null | head -n1)"; fi
+if [ -z "$chrome" ] || ! [ -x "$chrome" ]; then
+  echo "check:dart: no Chrome for the browser tests (dart2js, dart2wasm). Install Chrome or Chromium, or set CHROME_EXECUTABLE to a Chrome binary." >&2
+  exit 127
+fi
+
 # Where the Dart code lives. Not `.`: the checkout also holds node_modules, build output and worktrees.
 dirs=(packages tool)
 # At most two test workers, as for every heavy local job.
@@ -22,13 +34,17 @@ for pubspec in packages/*/pubspec.yaml; do
 done
 
 vm_tests() { for d in "${pure_packages[@]}"; do (cd "$d" && [ ! -d test ] || "$DART" test "$workers") || return 1; done; }
-# Exit code 79 is "no test carries the tag": fine for a package with nothing to compare across targets.
+# Exit code 79 is "no test carries the tag": fine for a package with nothing to compare across targets,
+# a failure for the packages that must run on every target.
+packages_with_web_tests=(packages/ilchon_core)
 web_tests() {
-  local rc
+  local rc must
   for d in "${pure_packages[@]}"; do
     (cd "$d" && [ ! -d test ] || "$DART" test "$workers" -p chrome -c dart2js,dart2wasm -t web)
     rc=$?
-    [ "$rc" -eq 0 ] || [ "$rc" -eq 79 ] || return "$rc"
+    must=0; [[ " ${packages_with_web_tests[*]} " == *" $d "* ]] && must=1
+    if [ "$rc" -eq 79 ] && [ "$must" -eq 0 ]; then continue; fi
+    [ "$rc" -eq 0 ] || return "$rc"
   done
 }
 

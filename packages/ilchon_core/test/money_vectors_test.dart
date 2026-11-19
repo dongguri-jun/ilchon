@@ -35,16 +35,18 @@ void main() {
   checkVectors(moneyVectors, {
     'defaultCurrency': Port(
       (a) => defaultCurrency(Lang.values.byName(a.text('lang')), a.has('langs') ? a.texts('langs') : const []).code,
+      excused: 1,
     ),
-    'isCurrency': Port((a) => Currency.tryParse(a.text('value')) != null, refusals: [_false]),
-    'isMinor': Port((a) => Money.fromMinor(a.whole('value')) != null, refusals: [_false]),
-    'formatMoney': Port((a) => formatMoney(a.whole('minor'), a.currency('currency'))),
-    'formatMinorNumber': Port((a) => formatMinorNumber(a.whole('minor'), a.currency('currency'))),
+    'isCurrency': Port((a) => Currency.tryParse(a.text('value')) != null, refusals: [_false], excused: 5),
+    'isMinor': Port((a) => Money.fromMinor(a.whole('value')) != null, refusals: [_false], excused: 14),
+    'formatMoney': Port((a) => formatMoney(a.whole('minor'), a.currency('currency')), excused: 17),
+    'formatMinorNumber': Port((a) => formatMinorNumber(a.whole('minor'), a.currency('currency')), excused: 7),
     'formatFee': Port((a) => formatPremium(a.number('feePct'))),
-    'formatSats': Port((a) => formatSats(a.number('sats'))),
+    'formatSats': Port((a) => formatSats(a.number('sats')), excused: 8),
     'satsFor': Port(
       (a) => satsFor(a.whole('minor'), a.currency('currency'), a.optionalNumber('rate'), a.number('feePct')),
       refusals: [_null],
+      excused: 4,
     ),
     'requestSats': Port(
       (a) => requestSats(a.money('minor'), a.currency('currency'), a.optionalNumber('rate'), a.number('feePct')),
@@ -53,10 +55,12 @@ void main() {
         'fractional amount': 'a trade amount is a Money: whole minor units up to $maxMinor',
         'amount 2^53': 'a trade amount is a Money: whole minor units up to $maxMinor',
       },
+      excused: 6,
     ),
     'fiatFor': Port(
       (a) => fiatFor(a.whole('sats'), a.optionalNumber('rate'), a.number('feePct'), a.currency('currency'))?.minor,
       refusals: [_null],
+      excused: 4,
     ),
     'asksOver': Port(
       (a) => asksOver(
@@ -67,6 +71,7 @@ void main() {
         a.number('feePct'),
       ),
       refusals: [_false],
+      excused: 8,
     ),
     'parseMinor': Port(
       (a) => parseMinor(a.text('text'), a.currency('currency'))?.minor ?? double.nan,
@@ -88,6 +93,6 @@ void main() {
       ),
     ),
     'significantBefore': Port((a) => significantBefore(a.text('raw'), a.whole('pos'), a.optionalCurrency('currency'))),
-    'minorToInput': Port((a) => minorToInput(a.whole('minor'), a.currency('currency'))),
+    'minorToInput': Port((a) => minorToInput(a.whole('minor'), a.currency('currency')), excused: 7),
   });
 }

@@ -49,10 +49,32 @@ From the repository root: `pnpm check:dart` (or `bash tool/check_dart.sh`) runs 
 dependency rules and the tests on the VM, dart2js and dart2wasm. In this folder, `dart test` runs the VM
 tests and `dart test -p chrome -c dart2js,dart2wasm -t web` the browser ones.
 
+It needs the pinned Dart SDK (Dart 3.14.0, from Flutter 3.50.0; set `ILCHON_DART` to another path) and
+a Chrome or Chromium for the browser step (set `CHROME_EXECUTABLE`); the script says which one is
+missing. A run takes about 30 seconds on the check machine, of which the browser step is 10 to 12.
+The Dart version is named in `.fvmrc`, `.github/workflows/check.yml` and the `sdk` ranges of the
+`pubspec.yaml` files; change all of them together.
+
 The payment rules are checked against reference vectors written by the TypeScript app
 (`spec/vectors/`, copied into `test/vectors/` by `dart run tool/vectors.dart`). Every case of every
-function is checked; a case the Dart types cannot take passes only when the TypeScript result was a
-refusal, or when the test names it with the reason.
+function is compared, except the cases a test names as excused (a Dart type cannot take the input);
+each test states how many, and the run fails when the number differs. The copies in `test/vectors/`
+are committed so that `dart test` works in this folder alone; `pnpm check:dart` fails when they are
+stale.
+
+## Adding a rule set
+
+1. Write `scripts/vectors/<name>.ts` with the helpers of `scripts/vectors/kit.ts` and register it in
+   `scripts/export-vectors.ts`; run `pnpm vectors`. The files in `spec/vectors/` are the contract
+   between the TypeScript and the Dart side.
+2. Run `dart run tool/vectors.dart` to copy them into `test/vectors/`.
+3. Add `lib/src/domain/<zone>/<name>.dart` and a line to the show list of `lib/ilchon_core.dart`.
+4. Write `test/<name>_vectors_test.dart` with `@Tags(['web'])`, `checkVectors` and one `Port` per
+   function. An input the Dart types cannot take throws `NotExpressible` from the `Args` reader; the
+   case passes when its expected result is one of the port's `refusals`, when it is marked
+   `outOfDomain` in the file, or when the port names it in `cannotExpress` with the reason. The port
+   states the number of excused cases in `excused`.
+5. Run `pnpm check:dart`.
 
 ## Dependency rules
 

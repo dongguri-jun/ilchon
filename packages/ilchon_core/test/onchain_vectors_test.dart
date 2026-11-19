@@ -23,18 +23,22 @@ void main() {
     'parseAddress': Port((a) {
       final parsed = parseAddress(a.text('text'));
       return parsed == null ? null : {'address': parsed.address, 'kind': parsed.kind.name};
-    }),
-    'addressProblem': Port((a) => addressProblem(a.text('text'))?.name),
-    'btcText': Port((a) => btcText(a.sats('sats')), refusals: [rangeError]),
-    'bip21': Port((a) => bip21(a.text('address'), a.optionalSats('sats')), refusals: [rangeError]),
+    }, excused: 3),
+    'addressProblem': Port((a) => addressProblem(a.text('text'))?.name, excused: 2),
+    'btcText': Port((a) => btcText(a.sats('sats')), refusals: [rangeError], excused: 12),
+    'bip21': Port((a) => bip21(a.text('address'), a.optionalSats('sats')), refusals: [rangeError], excused: 12),
     'parseOnchainRequest': Port((a) {
       final request = parseOnchainRequest(a.text('token'));
       return request == null ? null : onchainRequestShape(request);
-    }),
-    'onchainCardValues': Port((a) {
-      final req = a.object('req');
-      final values = onchainCardValues(OnchainRequest(req.text('address'), req.optionalSats('sats')));
-      return {'address': values.address, 'btc': values.btc, 'link': values.link};
-    }, refusals: [rangeError]),
+    }, excused: 2),
+    'onchainCardValues': Port(
+      (a) {
+        final req = a.object('req');
+        final values = onchainCardValues(OnchainRequest(req.text('address'), req.optionalSats('sats')));
+        return {'address': values.address, 'btc': values.btc, 'link': values.link};
+      },
+      refusals: [rangeError],
+      excused: 2,
+    ),
   });
 }

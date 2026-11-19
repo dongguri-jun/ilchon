@@ -92,7 +92,7 @@ final class Args {
 
 /// How one function is checked against its vectors.
 final class Port {
-  Port(this.run, {this.refusals = const [], this.cannotExpress = const {}});
+  Port(this.run, {this.refusals = const [], this.cannotExpress = const {}, this.excused = 0});
 
   /// Calls the Dart function with the case input and returns its result in the shape of the vector file.
   final Object? Function(Args args) run;
@@ -103,6 +103,11 @@ final class Port {
 
   /// Cases the Dart types cannot express although their result is not a refusal, by case name, with why.
   final Map<String, String> cannotExpress;
+
+  /// How many cases are expected to go unchecked: those the Dart types cannot take or refuse, either
+  /// marked out of domain, answered by a [refusals] outcome, or listed in [cannotExpress]. The run fails
+  /// when the real number differs, so a reader that refuses too much cannot pass unnoticed.
+  final int excused;
 }
 
 /// Checks every case of the vector file [json] against [ports], one test per function, and that every case
@@ -124,14 +129,19 @@ void checkVectors(String json, Map<String, Port> ports) {
     if (port == null) continue;
     test('${file.module}.${function.name}: ${function.cases.length} cases', () {
       final failures = <String>[];
-      var checked = 0;
+      var excused = 0;
       for (final c in function.cases) {
-        final failure = _check(port, c);
-        checked++;
+        final verdict = _check(port, c);
+        if (verdict.excused) excused++;
+        final failure = verdict.failure;
         if (failure != null) failures.add('${c.name}: $failure');
       }
       expect(failures, isEmpty);
-      expect(checked, function.cases.length);
+      expect(
+        excused,
+        port.excused,
+        reason: 'cases excused from comparison; ${function.cases.length - excused} compared',
+      );
       expect(
         port.cannotExpress.keys.where((n) => !function.cases.any((c) => c.name == n)),
         isEmpty,
@@ -141,19 +151,26 @@ void checkVectors(String json, Map<String, Port> ports) {
   }
 }
 
-String? _check(Port port, VectorCase c) {
+typedef _Verdict = ({String? failure, bool excused});
+
+_Verdict _check(Port port, VectorCase c) {
   final Outcome actual;
   try {
     actual = Returned(port.run(Args(c.input)));
   } on NotExpressible catch (e) {
     final excused =
         c.outOfDomain || port.refusals.any((r) => _sameOutcome(r, c.outcome)) || port.cannotExpress.containsKey(c.name);
-    return excused ? null : 'Dart cannot take this input ($e) but the expected ${c.outcome} is not a refusal';
+    return (
+      failure: excused ? null : 'Dart cannot take this input ($e) but the expected ${c.outcome} is not a refusal',
+      excused: excused,
+    );
   } on ArgumentError catch (e) {
-    return c.outOfDomain ? null : 'Dart refused an input real callers pass: $e';
+    return (failure: c.outOfDomain ? null : 'Dart refused an input real callers pass: $e', excused: c.outOfDomain);
   }
-  if (port.cannotExpress.containsKey(c.name)) return 'listed as not expressible, but Dart took it and gave $actual';
-  return _sameOutcome(actual, c.outcome) ? null : 'expected ${c.outcome}, got $actual';
+  if (port.cannotExpress.containsKey(c.name)) {
+    return (failure: 'listed as not expressible, but Dart took it and gave $actual', excused: false);
+  }
+  return (failure: _sameOutcome(actual, c.outcome) ? null : 'expected ${c.outcome}, got $actual', excused: false);
 }
 
 bool _sameOutcome(Outcome a, Outcome b) => switch ((a, b)) {

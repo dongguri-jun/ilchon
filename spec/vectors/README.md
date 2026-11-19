@@ -49,3 +49,7 @@ Any other number is a plain JSON number. A plain integer is always a safe intege
 - Amounts are JavaScript numbers (IEEE doubles). `requestSats`, `satsFor` and `fiatFor` are defined by the order of their floating-point operations: keep that order, and use doubles rather than 64-bit integers where the vectors hold values past 2^53.
 - Rounding: `Math.round` rounds halves toward positive infinity (`-2.5` gives `-2`); `toFixed` and `toLocaleString('en-US')` are the formats the expected strings come from.
 - Text lengths and `trim()` follow JavaScript: UTF-16 code units, and `trim()` removes the characters in the `around the token` cases and no others.
+
+## Contract
+
+These files are the contract between the TypeScript app and the Dart packages: the Dart tests read the committed copies in `packages/ilchon_core/test/vectors/` (made by `dart run tool/vectors.dart`), and `pnpm check` fails when a copy or a file here is stale.

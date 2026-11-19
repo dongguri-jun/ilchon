@@ -24,7 +24,7 @@ void main() {
     'decodeInvoice': Port((a) {
       final invoice = decodeInvoice(a.text('text'));
       return invoice == null ? null : invoiceShape(invoice);
-    }),
+    }, excused: 2),
     'invoiceCandidates': Port((a) => invoiceCandidates(a.text('text'))),
     'secondsLeft': Port((a) => secondsLeft(decodedInvoice(a), Instant(a.whole('nowMs')))),
     'msUntilRecount': Port(
@@ -37,6 +37,7 @@ void main() {
         'interval NaN': wholeMilliseconds,
         'interval Infinity': wholeMilliseconds,
       },
+      excused: 6,
     ),
     'invoiceIssues': Port(
       (a) => [for (final issue in invoiceIssues(decodedInvoice(a), Instant(a.whole('nowMs')))) issue.name],
