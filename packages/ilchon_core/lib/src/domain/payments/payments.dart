@@ -3,7 +3,6 @@ library;
 
 export 'amount_input.dart';
 export 'bolt11.dart';
-export 'currency.dart';
 export 'money.dart';
 export 'onchain.dart';
 export 'payment_request.dart';

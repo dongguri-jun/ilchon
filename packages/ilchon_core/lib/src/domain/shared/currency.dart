@@ -1,5 +1,5 @@
-import '../shared/lang.dart';
-import 'text.dart';
+import 'ascii.dart';
+import 'lang.dart';
 
 /// Which keyboard an amount field asks the phone for.
 enum AmountKeyboard {

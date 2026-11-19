@@ -1,4 +1,4 @@
-import 'currency.dart';
+import '../shared/currency.dart';
 import 'text.dart';
 
 /// [raw] with the fullwidth digits ０ to ９ (U+FF10 to U+FF19), point ． (U+FF0E) and comma ，

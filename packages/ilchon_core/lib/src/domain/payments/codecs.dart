@@ -1,6 +1,6 @@
 import 'package:crypto/crypto.dart' show sha256;
 
-import 'text.dart';
+import '../shared/ascii.dart';
 
 /// The two checksums of the bech32 family: BIP-173 (bech32) and BIP-350 (bech32m).
 enum Bech32Checksum {

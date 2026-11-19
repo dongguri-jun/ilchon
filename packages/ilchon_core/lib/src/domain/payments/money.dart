@@ -1,32 +1,9 @@
-import 'currency.dart';
+import '../shared/currency.dart';
+import '../shared/money.dart';
 import 'text.dart';
-
-/// The largest fiat amount in minor units: twelve digits, far below 2^53, so exact on every compile target.
-const int maxMinor = 999999999999;
 
 /// How far above the trade amount an invoice may ask before it is flagged: prices move while people talk.
 const double overTolerance = 0.03;
-
-/// A fiat amount in the smallest unit of its currency (won, yen or cents): a whole number from 1 to
-/// [maxMinor]. Every amount that is stored, sent or subtracted is one.
-final class Money {
-  const Money._(this.minor);
-
-  /// The amount in minor units.
-  final int minor;
-
-  /// Makes a [Money], or returns null when [minor] is outside 1 to [maxMinor].
-  static Money? fromMinor(int minor) => minor >= 1 && minor <= maxMinor ? Money._(minor) : null;
-
-  @override
-  bool operator ==(Object other) => other is Money && other.minor == minor;
-
-  @override
-  int get hashCode => minor.hashCode;
-
-  @override
-  String toString() => 'Money(<redacted>)';
-}
 
 void _checkAmount(int minor) => RangeError.checkNotNegative(minor, 'minor');
 
@@ -90,9 +67,9 @@ String _toFixed2(double x) {
 String _numberText(double x) => x == x.truncateToDouble() && x.abs() < 1e21 ? wholeNumberText(x) : '$x';
 
 /// [sats] rounded to whole satoshis (halves up) with thousands separators: `66,667`. Takes the fractional
-/// estimates [satsFor] gives. Throws [ArgumentError] for a negative or not finite number.
+/// estimates [satsFor] gives. Throws [RangeError] for a negative or not finite number.
 String formatSats(double sats) {
-  if (!sats.isFinite || sats.isNegative) throw ArgumentError.value(sats, 'sats', 'not a finite amount');
+  if (!sats.isFinite || sats.isNegative) throw RangeError.value(sats, 'sats', 'not a finite amount');
   return groupThousands(wholeNumberText(roundHalfUp(sats)));
 }
 

@@ -1,3 +1,4 @@
+import '../shared/ascii.dart';
 import '../shared/instant.dart';
 import 'codecs.dart';
 import 'text.dart';

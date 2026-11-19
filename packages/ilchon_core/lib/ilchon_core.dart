@@ -6,13 +6,10 @@ export 'src/domain/payments/payments.dart'
         AddressKind,
         AddressProblem,
         AmountInputMode,
-        AmountKeyboard,
-        Currency,
         Invoice,
         InvoiceIssue,
         LightningPaymentRequest,
         LnNetwork,
-        Money,
         OnchainCardValues,
         OnchainPaymentRequest,
         OnchainRequest,
@@ -26,7 +23,6 @@ export 'src/domain/payments/payments.dart'
         bip21,
         btcText,
         decodeInvoice,
-        defaultCurrency,
         defaultExpirySeconds,
         expiringSoonSeconds,
         expiryRecountSlackMs,
@@ -40,7 +36,6 @@ export 'src/domain/payments/payments.dart'
         invoiceIssues,
         isPaymentRequestCandidate,
         maxAddressLength,
-        maxMinor,
         maxSats,
         minorToInput,
         msUntilRecount,
@@ -60,5 +55,7 @@ export 'src/domain/payments/payments.dart'
         splitPaymentText,
         stripLightningScheme,
         toAsciiDigits;
+export 'src/domain/shared/currency.dart' show AmountKeyboard, Currency, defaultCurrency;
 export 'src/domain/shared/instant.dart' show Instant;
 export 'src/domain/shared/lang.dart' show Lang;
+export 'src/domain/shared/money.dart' show Money, maxMinor;

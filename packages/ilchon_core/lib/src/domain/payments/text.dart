@@ -4,6 +4,8 @@
 // and Dart's versions differ between the VM and the web in exactly these corners (U+0085, the BOM,
 // encoded surrogates).
 
+import '../shared/ascii.dart';
+
 /// White space as the web platform defines it for `trim()` and `\s`: tab, line feed, vertical tab, form
 /// feed, carriage return, space, U+00A0, U+1680, U+2000 to U+200A, U+2028, U+2029, U+202F, U+205F,
 /// U+3000 and the byte order mark U+FEFF. U+0085, U+180E and U+200B are not white space.
@@ -49,32 +51,24 @@ List<String> splitAtWhitespace(String text, {bool keepSeparators = false}) {
   return parts;
 }
 
-const int _kelvinSign = 0x212a;
-
-bool _isUpperAscii(int unit) => unit >= 0x41 && unit <= 0x5a;
-
-/// [text] with A to Z and the Kelvin sign (U+212A) lowered; every other character kept.
-///
-/// For text that is ASCII apart from Kelvin signs this is exactly `toLowerCase()` of the web platform:
-/// the Kelvin sign is the one character outside ASCII that it lowers to an ASCII letter. Every caller
-/// either compares the result with ASCII words or rejects anything else that is not ASCII, so the
-/// characters left as they are never change a result.
-String lowerAscii(String text) {
-  final units = text.codeUnits;
-  if (!units.any((u) => _isUpperAscii(u) || u == _kelvinSign)) return text;
-  return String.fromCharCodes([for (final u in units) _isUpperAscii(u) ? u + 0x20 : (u == _kelvinSign ? 0x6b : u)]);
-}
-
-/// Whether [text] holds both a letter lowering changes and a letter raising changes: A to Z or the Kelvin
-/// sign, and a to z. This is the bech32 "mixed case" test for text that is ASCII apart from Kelvin signs.
+/// Whether [text] holds both a letter lowering changes and a letter raising changes: the bech32 "mixed
+/// case" test, `text != text.toLowerCase() && text != text.toUpperCase()` of the web platform. Letters
+/// outside ASCII are judged by the case mapping of the compile target.
 bool hasMixedCase(String text) {
   var lowerable = false;
   var raisable = false;
-  for (final u in text.codeUnits) {
-    if (_isUpperAscii(u) || u == _kelvinSign) lowerable = true;
-    if (u >= 0x61 && u <= 0x7a) raisable = true;
+  for (final rune in text.runes) {
+    if (rune < 0x80) {
+      if (isUpperAscii(rune)) lowerable = true;
+      if (rune >= 0x61 && rune <= 0x7a) raisable = true;
+    } else {
+      final letter = String.fromCharCode(rune);
+      if (letter.toLowerCase() != letter) lowerable = true;
+      if (letter.toUpperCase() != letter) raisable = true;
+    }
+    if (lowerable && raisable) return true;
   }
-  return lowerable && raisable;
+  return false;
 }
 
 /// Whether [text] starts with [prefix], comparing ASCII letters without case. [prefix] is lower-case ASCII.
@@ -83,7 +77,7 @@ bool startsWithIgnoringCase(String text, String prefix) {
   if (text.length < prefix.length) return false;
   for (var i = 0; i < prefix.length; i++) {
     final u = text.codeUnitAt(i);
-    if ((_isUpperAscii(u) ? u + 0x20 : u) != prefix.codeUnitAt(i)) return false;
+    if ((isUpperAscii(u) ? u + 0x20 : u) != prefix.codeUnitAt(i)) return false;
   }
   return true;
 }
@@ -107,9 +101,22 @@ double roundHalfUp(double x) {
   return rounded == 0 && x < 0 ? -0.0 : rounded;
 }
 
-/// All decimal digits of the whole number [whole], exact also past 2^53.
-String wholeNumberText(double whole) =>
-    whole.abs() < 9007199254740991 ? whole.toInt().toString() : BigInt.from(whole).toString();
+/// The whole number [whole] written out in decimal digits, as the web platform prints it: from 2^53 on only
+/// the shortest digits that identify the double, then zeros (`1e17 + 16` gives `100000000000000020`).
+String wholeNumberText(double whole) {
+  if (whole.abs() < 9007199254740991) return whole.toInt().toString();
+  final shortest = '${whole.abs()}';
+  final String digits;
+  final exponent = shortest.indexOf('e');
+  if (exponent < 0) {
+    digits = shortest.endsWith('.0') ? shortest.substring(0, shortest.length - 2) : shortest;
+  } else {
+    final mantissa = shortest.substring(0, exponent).replaceAll('.', '');
+    final integerDigits = int.parse(shortest.substring(exponent + 1)) + 1;
+    digits = mantissa.padRight(integerDigits, '0');
+  }
+  return whole < 0 ? '-$digits' : digits;
+}
 
 /// `decodeURIComponent`: every `%XX` escape decoded as UTF-8. Null where that throws: a `%` not followed
 /// by two hex digits, or escapes that are not well-formed UTF-8 (overlong, surrogates, past U+10FFFF).

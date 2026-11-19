@@ -1,3 +1,4 @@
+import '../shared/ascii.dart';
 import 'codecs.dart';
 import 'sats.dart';
 import 'text.dart';
@@ -144,9 +145,10 @@ AddressProblem? addressProblem(String text) {
 String bip21(String address, Sats? sats) =>
     sats == null ? 'bitcoin:$address' : 'bitcoin:$address?amount=${btcText(sats)}';
 
-/// A request to be paid on chain, read from a chat token by [parseOnchainRequest].
+/// A request to be paid on chain. What arrives in a chat token is read by [parseOnchainRequest].
 final class OnchainRequest {
-  /// A request for [sats] (or any amount when null) to [address].
+  /// A request for [sats] (or any amount when null) to [address]. The address is not checked here; only
+  /// [parseOnchainRequest] checks one.
   const OnchainRequest(this.address, this.sats);
 
   /// Where to pay.
