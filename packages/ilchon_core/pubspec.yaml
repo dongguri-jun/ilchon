@@ -1,0 +1,12 @@
+name: ilchon_core
+description: The rules of ilchon in pure Dart. No Flutter, no I/O, no clock of its own.
+version: 0.0.0
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.9.0
+dependencies:
+  crypto: 3.0.8
+dev_dependencies:
+  ilchon_testkit: any
+  test: ^1.26.0

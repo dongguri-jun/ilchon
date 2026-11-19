@@ -1,0 +1,13 @@
+name: ilchon_workspace
+description: Workspace root of the Dart code. Not a package anyone depends on.
+publish_to: none
+environment:
+  sdk: ^3.14.0
+workspace:
+  - packages/*
+dev_dependencies:
+  analyzer: 14.7.0
+  lints: 6.1.0
+  path: 1.9.1
+  test: 1.32.0
+  yaml: 3.1.3

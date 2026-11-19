@@ -1,0 +1,5 @@
+# Tests tagged `web` also run compiled to JS and to Wasm in headless Chrome:
+#   dart test -p chrome -c dart2js,dart2wasm -t web
+tags:
+  web:
+    description: Pure rules whose results must be identical on the VM, dart2js and dart2wasm.

@@ -1,4 +1,5 @@
 node_modules
+.dart_tool/
 dist
 # Screen test (pnpm e2e:ui) failure traces and screenshots
 test-results/
