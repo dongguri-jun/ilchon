@@ -32,6 +32,7 @@
     "check:csp": "tsx scripts/check-csp.ts",
     "check:a11y": "tsx scripts/check-a11y.ts",
     "check:tokens": "tsx scripts/check-tokens.ts",
+    "check:dart": "bash tool/check_dart.sh",
     "check:lint": "biome ci --diagnostic-level=error .",
     "lint": "biome lint .",
     "format": "biome format --write .",

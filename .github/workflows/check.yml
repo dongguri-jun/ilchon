@@ -20,6 +20,10 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # The Dart SDK of the pinned Flutter (.fvmrc); `pnpm check` runs the Dart check too (check:dart).
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.14.0
       # Typecheck, private matching, currency, translation, key lock, invoice, relay, profile and engine checks. No network needed.
       - run: pnpm check
       - run: pnpm build

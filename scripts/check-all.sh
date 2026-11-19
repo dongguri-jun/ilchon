@@ -29,6 +29,7 @@ STEPS=(
   check:csp
   check:a11y
   check:tokens
+  check:dart
   check:boot
   check:guard
   check:engine
