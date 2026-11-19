@@ -1,0 +1,207 @@
+/* Setup (12 words), unlock and lock screens. */
+.lock-screen {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.lock-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-20);
+  padding-top: var(--sp-24);
+  padding-bottom: calc(var(--sp-32) + var(--safe-b));
+}
+.lock-body--center {
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  text-align: center;
+}
+.lock-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+.lock-head--left {
+  text-align: left;
+}
+.lock-name {
+  font-family: var(--font-num);
+  font-size: var(--fs-32);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+}
+.lock-logo {
+  display: block;
+  width: auto;
+  height: 36px;
+  max-width: 100%;
+  object-fit: contain;
+}
+.lock-icon {
+  display: inline-flex;
+  color: var(--c-accent);
+}
+.lock-unlock {
+  width: 100%;
+  max-width: 360px;
+  text-align: left;
+}
+.lock-path {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+  text-align: left;
+}
+.lock-err {
+  margin: 0;
+  color: var(--c-danger-text);
+}
+.lock-link {
+  margin-top: var(--sp-16);
+  padding: var(--sp-8);
+  border: 0;
+  background: none;
+  color: var(--c-text-dim);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Lock method options */
+.lock-opts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+.lock-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-12);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--sp-12) var(--sp-16);
+  border: var(--bw-1) solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+/* A choice with a title only (the development-only one): no room kept for a description. */
+.lock-opt--plain {
+  align-items: center;
+  min-height: 48px;
+}
+.lock-opt--plain .lock-opt__dot {
+  margin-top: 0;
+}
+.lock-opt:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.lock-opt--on {
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft);
+}
+.lock-opt--danger.lock-opt--on {
+  border-color: var(--c-danger);
+  background: var(--c-danger-soft);
+}
+.lock-opt__dot {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  border: var(--bw-2) solid var(--c-border-strong);
+  border-radius: 50%;
+}
+.lock-opt--on .lock-opt__dot {
+  /* 5px is the ring-to-dot proportion of the 18px radio, not a stroke weight: no token fits */
+  border: 5px solid var(--c-accent);
+}
+.lock-opt--danger.lock-opt--on .lock-opt__dot {
+  border-color: var(--c-danger);
+}
+.lock-opt__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+.lock-opt__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-6);
+}
+.lock-opt--danger .lock-opt__title {
+  color: var(--c-danger-text);
+}
+
+/* The 12 words: two columns, 1-6 then 7-12, numbered (WordGrid). Plain body text, selectable. */
+.lock-words {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(6, auto);
+  grid-auto-flow: column;
+  gap: var(--sp-8) var(--sp-12);
+  margin: 0;
+  padding: var(--sp-16);
+  border: var(--bw-1) solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface-2);
+  list-style: none;
+}
+.lock-words__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-8);
+  min-width: 0;
+}
+.lock-words__n {
+  flex: 0 0 auto;
+  min-width: 1.5em;
+  color: var(--c-text-dim);
+  text-align: right;
+}
+.lock-words__w {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: var(--fw-bold);
+}
+.lock-warn {
+  margin: 0;
+  color: var(--c-danger-text);
+}
+/* "I wrote down the 12 words" */
+.lock-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-12);
+  cursor: pointer;
+}
+.lock-check input {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--c-accent);
+}
+
+/* PIN fields (PinField.tsx): a text field whose digits the browser draws
+   as dots, so no password manager takes the PIN for a login. Where the property is not
+   supported PinField uses type="password" instead. */
+.lock-pin .ui-field__input {
+  -webkit-text-security: disc;
+}
+
+/* The restore result: when it appears the field loses focus and the
+   result scrolls into view; the margin keeps its buttons off the bottom edge. */
+.lock-restore-result {
+  scroll-margin-bottom: calc(var(--sp-24, 24px) + env(safe-area-inset-bottom, 0px));
+}

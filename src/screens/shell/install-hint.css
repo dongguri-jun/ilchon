@@ -1,0 +1,91 @@
+.install-hint {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  align-items: flex-start;
+  padding: var(--sp-12) var(--sp-16);
+  border-radius: var(--radius-md);
+  background: var(--c-info-soft);
+  color: var(--c-text);
+  font-size: var(--fs-14);
+}
+.install-hint--compact { padding: var(--sp-8) var(--sp-12); gap: var(--sp-4); }
+.install-hint p { margin: 0; }
+
+.install-url {
+  max-width: 100%;
+  margin: 0;
+  padding: var(--sp-8) var(--sp-12);
+  border-radius: var(--radius-sm);
+  background: var(--c-surface);
+  overflow-wrap: anywhere;
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+/* Main content of the setup screen on iOS and in in-app browsers. */
+.install-guide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-16);
+}
+.install-guide p { margin: 0; }
+.install-guide__logo,
+.phone-gate__logo {
+  display: block;
+  width: auto;
+  height: 36px;
+  max-width: 100%;
+  object-fit: contain;
+}
+.install-guide__steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  margin: 0;
+  padding-left: var(--sp-24);
+  list-style: decimal;
+}
+.install-guide__warn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-8);
+  padding: var(--sp-12);
+  border-radius: var(--radius-md);
+  background: var(--c-warning-soft);
+}
+.install-guide__warn > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--c-warning);
+}
+.install-guide__skip {
+  align-self: center;
+  min-height: 44px;
+  padding: var(--sp-8);
+  border: 0;
+  background: none;
+  color: var(--c-text-dim);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* margin: auto centers it and, unlike justify-content, keeps the top reachable when it overflows. */
+.phone-gate {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+.phone-gate__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-16);
+  margin: auto;
+  padding: var(--sp-32) var(--sp-24);
+  max-width: 420px;
+  text-align: center;
+}
+.phone-gate__body p { margin: 0; }

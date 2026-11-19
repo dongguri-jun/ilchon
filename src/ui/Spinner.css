@@ -1,0 +1,39 @@
+.ui-spinner {
+  display: inline-block;
+  flex: none;
+  border-style: solid;
+  border-color: color-mix(in srgb, currentColor 22%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: ui-spin var(--dur-spin) linear infinite;
+}
+.ui-spinner--accent {
+  color: var(--c-accent);
+}
+.ui-spinner--dim {
+  color: var(--c-text-dim);
+}
+.ui-spinner--inherit {
+  color: inherit;
+}
+@keyframes ui-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* tokens.css stops every animation after one 0.01ms pass under reduced motion, which
+   freezes the spinner as a still ring. A slow fade keeps it looking alive
+   without rotation. Longhands with !important to beat that global rule. */
+@keyframes ui-spin-fade {
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-spinner {
+    animation-name: ui-spin-fade !important;
+    animation-duration: 1.6s !important;
+    animation-timing-function: var(--ease-in-out) !important;
+    animation-iteration-count: infinite !important;
+  }
+}

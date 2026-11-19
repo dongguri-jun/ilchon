@@ -1,0 +1,12 @@
+node_modules
+dist
+# Screen test (pnpm e2e:ui) failure traces and screenshots
+test-results/
+*.local
+.DS_Store
+*.tsbuildinfo
+.wrangler
+.env
+.env.*
+!.env.example
+번역/out/

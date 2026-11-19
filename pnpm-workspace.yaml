@@ -1,0 +1,7 @@
+packages:
+  - .
+allowBuilds:
+  esbuild: true
+  workerd: false
+# minutes; a version must be at least a day old before pnpm installs it (pnpm 11 default, kept explicit)
+minimumReleaseAge: 1440

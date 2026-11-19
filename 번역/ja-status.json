@@ -1,0 +1,975 @@
+{
+  "board.buyerHint": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "d79479d44972",
+      "ja": "2e791ecadf3f"
+    }
+  },
+  "board.buyerHintAny": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "739838e5b130",
+      "ja": "56c6269dddad"
+    }
+  },
+  "board.buyerHintOnchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "d7090a57aeab",
+      "ja": "2203d7fc97b2"
+    }
+  },
+  "board.changeWarn": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "aab79368ef18",
+      "ja": "9994872581c4"
+    }
+  },
+  "board.emptyBody": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "98a8dfe1b0c2",
+      "ja": "732a707720c5"
+    }
+  },
+  "board.feeHelper": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "35eaecc022ec",
+      "ja": "9d0ed1636c1a"
+    }
+  },
+  "board.feeLabel": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "8170691ae091",
+      "ja": "7d7276e2e314"
+    }
+  },
+  "board.footnote": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "8ffa635cabb4",
+      "ja": "16ed0d971c02"
+    }
+  },
+  "board.matchesKept": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "bc405032e729",
+      "ja": "ec1fd5ac8abf"
+    }
+  },
+  "board.previewBuy": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "702dbe739e23",
+      "ja": "04e77eb7f460"
+    }
+  },
+  "board.previewBuyFlat": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "e1daf5e06913",
+      "ja": "ff22771f67eb"
+    }
+  },
+  "board.previewSell": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "bfeb1c30ac09",
+      "ja": "478fc8643515"
+    }
+  },
+  "board.previewSellFlat": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "17122130a25e",
+      "ja": "a3408d7f13c4"
+    }
+  },
+  "board.sellerHint": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "2f234c56571e",
+      "ja": "42ebba3a9484"
+    }
+  },
+  "board.sellerHintAny": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "ac0c1d17ede9",
+      "ja": "80059e311185"
+    }
+  },
+  "board.sellerHintOnchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "5d112ee8603a",
+      "ja": "c477a88fdbad"
+    }
+  },
+  "board.sheetPrivacy": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "c108ebc72d61",
+      "ja": "72ba4950c2c8"
+    }
+  },
+  "board.sideBuy": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "36af380b39c4",
+      "ja": "d28d6390a88f"
+    }
+  },
+  "board.sideSell": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "e92548d3b033",
+      "ja": "a1ab4f30ff3d"
+    }
+  },
+  "board.withdrawBody": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "ddca5f9eb5ab",
+      "ja": "90973d8aade6"
+    }
+  },
+  "connect.err.invalid": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "be63d8c8a04f",
+      "ja": "64ed51a9f551"
+    }
+  },
+  "connect.err.self": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "095d5816d262",
+      "ja": "9aa45ac672a9"
+    }
+  },
+  "connect.nameHelper": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "72cf31a1ff39",
+      "ja": "0cf6b6d8b005"
+    }
+  },
+  "contacts.deleteBody": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "3181db4b67f5",
+      "ja": "4c9671da79e4"
+    }
+  },
+  "contacts.deleteConfirm": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "6139b6c3ed73",
+      "ja": "e9653dc3edcb"
+    }
+  },
+  "contacts.deleteTitle": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "ea7ac16e1fd8",
+      "ja": "33d46181c500"
+    }
+  },
+  "contacts.nameHelper": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "72cf31a1ff39",
+      "ja": "0cf6b6d8b005"
+    }
+  },
+  "contacts.nostrPrivacy": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "6fecd96fddf3",
+      "ja": "caea0540e9fc"
+    }
+  },
+  "contacts.nostrWarning": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "9b551c65cdca",
+      "ja": "59c1af68a8bd"
+    }
+  },
+  "install.iosWarn": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "70ced3241c89",
+      "ja": "6c3acb894fbb"
+    }
+  },
+  "lock.chooseBody": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "aaad281ce664",
+      "ja": "55f630b9e83f"
+    }
+  },
+  "lock.choosePasskeyHelp": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "820d74a59363",
+      "ja": "59a970bff3fa"
+    }
+  },
+  "lock.choosePinHelp": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "ecc8df1d6b1c",
+      "ja": "4aa7b44914dc"
+    }
+  },
+  "lock.errCorrupt": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "4e62dea760fd",
+      "ja": "00b788391548"
+    }
+  },
+  "lock.errMnemonic": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "cf65d5202857",
+      "ja": "5494e35bddbc"
+    }
+  },
+  "lock.errPasskeyMismatch": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "d354afb83b8f",
+      "ja": "38848007822f"
+    }
+  },
+  "lock.errPinWait": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "a62c79a83203",
+      "ja": "7843936500f1"
+    }
+  },
+  "lock.errPrfUnlock": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "aa2e62f9b99f",
+      "ja": "6f35f6b051dc"
+    }
+  },
+  "lock.errStorageDamaged": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "12f6a3ed3ae0",
+      "ja": "06fa40321e65"
+    }
+  },
+  "lock.errStorageUnavailable": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "65ca57d916f2",
+      "ja": "7c2199bec2f5"
+    }
+  },
+  "lock.errWeakPin": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "30ff1f856c5e",
+      "ja": "4717b3f279e8"
+    }
+  },
+  "lock.lockScope": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "97511e3c023b",
+      "ja": "b4edbb736f35"
+    }
+  },
+  "lock.passkeyMissingHint": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "e27f6b8b2620",
+      "ja": "631c008b63aa"
+    }
+  },
+  "lock.pathNewHelp": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "763a1563330f",
+      "ja": "e20db3ed49af"
+    }
+  },
+  "lock.pathRestore": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "5d132a81db93",
+      "ja": "25f231281038"
+    }
+  },
+  "lock.pathRestoreHelp": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "cb5d41d26c96",
+      "ja": "bd7c23156a6c"
+    }
+  },
+  "lock.reauthPasskeyBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "c2205b489c2d",
+      "ja": "f3d3251c6dff"
+    }
+  },
+  "lock.resetBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "15abf34a270b",
+      "ja": "b5e3521cbf9b"
+    }
+  },
+  "lock.resetConfirm": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "645b60b46aa4",
+      "ja": "8b9d8439e0a9"
+    }
+  },
+  "lock.resetTitle": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "7cc082da9643",
+      "ja": "050b45323e9f"
+    }
+  },
+  "lock.restoreContinue": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "9c5e834078c3",
+      "ja": "37b049120d64"
+    }
+  },
+  "lock.restoreNotFound": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "1ba8fc68a996",
+      "ja": "c1eb3e52f84e"
+    }
+  },
+  "lock.wordsBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "e09dfbb784a8",
+      "ja": "775be1a6db36"
+    }
+  },
+  "lock.wordsPhishing": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "4f049213a36d",
+      "ja": "4f1cd5115992"
+    }
+  },
+  "lock.wordsSaved": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "1075f3f33410",
+      "ja": "ee7608c239f6"
+    }
+  },
+  "lock.wordsTitle": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "e3bccb1a36b8",
+      "ja": "ba57510ed197"
+    }
+  },
+  "room.addressShared": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "dfab94bbe139",
+      "ja": "12481fabd961"
+    }
+  },
+  "room.addressWait": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "10913dae599d",
+      "ja": "2e0bc3f6fdaf"
+    }
+  },
+  "room.addressWaitDeposit": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "a7afd1b6cee0",
+      "ja": "1a2e8194a295"
+    }
+  },
+  "room.buyDoneOnchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "9e2dfc49bf9b",
+      "ja": "aabae8d8aa98"
+    }
+  },
+  "room.buyInvoice": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "1e440bf859d4",
+      "ja": "380d95bfadf8"
+    }
+  },
+  "room.buyTransfer": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "bd36478232ce",
+      "ja": "00004be0c5d9"
+    }
+  },
+  "room.copyAddressOnly": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "6a7fe365018a",
+      "ja": "3d660a8912e0"
+    }
+  },
+  "room.copyLink": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "d6ceeabf7e0a",
+      "ja": "4dbdddb66a62"
+    }
+  },
+  "room.doneConsequence": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "a5f7fca22526",
+      "ja": "f7bc68336527"
+    }
+  },
+  "room.doneHelper": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "7c4ed1ef0aae",
+      "ja": "88de1162b496"
+    }
+  },
+  "room.doneNotice1": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "f964520a8b25",
+      "ja": "525f154aa53a"
+    }
+  },
+  "room.doneNotice1Onchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "14b50b79e094",
+      "ja": "371f328f3b24"
+    }
+  },
+  "room.doneNotice2": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "37b7c0fe5ae5",
+      "ja": "82ede8ff28ec"
+    }
+  },
+  "room.doneSellerFirst": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "3b8ca9d6bd99",
+      "ja": "e65435fbd99d"
+    }
+  },
+  "room.invInactive": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "25abbed253e4",
+      "ja": "51bc08555460"
+    }
+  },
+  "room.invIssueExpired": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "c9ced5fd0bd2",
+      "ja": "1e3985a57737"
+    }
+  },
+  "room.invIssueNetwork": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "975458a96795",
+      "ja": "4ae44d10b0ff"
+    }
+  },
+  "room.invIssueNoAmount": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "b365404aaae2",
+      "ja": "039b9c7e9e0e"
+    }
+  },
+  "room.invIssueNoAmountOnchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "e9a4acc8dfd9",
+      "ja": "1355d4a86e94"
+    }
+  },
+  "room.invIssueOver": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "f688f1a59bd3",
+      "ja": "6ee3bbb6981b"
+    }
+  },
+  "room.invIssueOverOnchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "1c54d9998d63",
+      "ja": "873b9b98ed0b"
+    }
+  },
+  "room.invIssueSoon": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "8f083ae5fbf8",
+      "ja": "9adf7eafd3e8"
+    }
+  },
+  "room.invNotPayer": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "7660704aa0b4",
+      "ja": "e8bf0b186748"
+    }
+  },
+  "room.invNotPayerOnchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "136414c77241",
+      "ja": "248108625450"
+    }
+  },
+  "room.invOpenHint": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "dc539c687f1a",
+      "ja": "7c31b6f66138"
+    }
+  },
+  "room.invOpenHintOnchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "ae2cabe61fc2",
+      "ja": "0dbca9ba9dfe"
+    }
+  },
+  "room.invOpenHintOnchainNoAmount": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "aff977f86c65",
+      "ja": "15e30dde901b"
+    }
+  },
+  "room.invoiceExpiredBuy": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "15c0edaef6ba",
+      "ja": "c5c38d829fdd"
+    }
+  },
+  "room.invoiceExpiredSell": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "5ad594d4daea",
+      "ja": "9bebe6aae5d1"
+    }
+  },
+  "room.invoiceReceived": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "b124807eb683",
+      "ja": "9e77050f6795"
+    }
+  },
+  "room.invoiceShared": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "26181b788eb6",
+      "ja": "9d8c3e60d0f6"
+    }
+  },
+  "room.invoiceWaitDeposit": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "3ca028434f37",
+      "ja": "5cb53bec1a86"
+    }
+  },
+  "room.manualChecks": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "b470ad03204c",
+      "ja": "47103c33b4c2"
+    }
+  },
+  "room.markDone": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "52fcc90bb36b",
+      "ja": "62ff9ca3bcce"
+    }
+  },
+  "room.partialDone": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "7ef7d02dd98e",
+      "ja": "2bf8679c5afb"
+    }
+  },
+  "room.pasteCheck": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "13c8b1bf89ed",
+      "ja": "68c0b94b574b"
+    }
+  },
+  "room.pasteExpired": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "adef0a22e83c",
+      "ja": "917e0c721e6d"
+    }
+  },
+  "room.pasteNetwork": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "ffe07128c9b2",
+      "ja": "488f3f713c0f"
+    }
+  },
+  "room.pasteNotInvoice": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "be51ea4f8a47",
+      "ja": "653815be04c1"
+    }
+  },
+  "room.reqChanged": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "7fee26ec0879",
+      "ja": "d7ebbc58dca1"
+    }
+  },
+  "room.reqErrBadAddress": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "41915e5d7509",
+      "ja": "8eea19fef816"
+    }
+  },
+  "room.reqErrMismatch": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "0f6dfe301c18",
+      "ja": "3292b892716f"
+    }
+  },
+  "room.reqErrReused": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "f15408718ef4",
+      "ja": "971ab9ab5215"
+    }
+  },
+  "room.sellDone": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "bc0de1231595",
+      "ja": "d36c280061c2"
+    }
+  },
+  "room.sellPay": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "01430c8b6a9c",
+      "ja": "e2a9e88d633b"
+    }
+  },
+  "room.sellPayOnchain": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "e1697e2c6260",
+      "ja": "ceb74bf7afbb"
+    }
+  },
+  "room.sellPayOnchainFee": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "306f1f1844e0",
+      "ja": "3f9177d10ec4"
+    }
+  },
+  "room.sellPayOnchainTitle": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "c1335d2e2d53",
+      "ja": "6f49d640e985"
+    }
+  },
+  "room.sellPayTo": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "0ef41e709cf9",
+      "ja": "b77157ef2c31"
+    }
+  },
+  "room.sellVerify": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "2fac65c93789",
+      "ja": "476d9751938e"
+    }
+  },
+  "room.sysReopened": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "05836aa69384",
+      "ja": "a2bfda6a3ab5"
+    }
+  },
+  "room.verifyName": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "7e1173f912ad",
+      "ja": "e941ce77041e"
+    }
+  },
+  "settings.limit1": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "a6b163c6c18c",
+      "ja": "6cc4de18982f"
+    }
+  },
+  "settings.limit2": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "a0a7eea1aa7e",
+      "ja": "3ff54d6a4ec2"
+    }
+  },
+  "settings.limit3": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "8f47dde29403",
+      "ja": "fa96d527ccf3"
+    }
+  },
+  "settings.limit4": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "97b267dcfa99",
+      "ja": "dddbacd3b295"
+    }
+  },
+  "settings.limit5": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "a96bcc5e06c8",
+      "ja": "d22aae8951c9"
+    }
+  },
+  "settings.lnConfirmBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "df7087e6dfce",
+      "ja": "d7b0ce60d0f4"
+    }
+  },
+  "settings.lockNoneBadge": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "c3a7efe1fe8f",
+      "ja": "6f939794af5d"
+    }
+  },
+  "settings.relayNoDefault": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "6a962d6b17d8",
+      "ja": "8c982542e3e7"
+    }
+  },
+  "settings.relockHelp": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "9ef49cb066a6",
+      "ja": "9cfe019aa6e8"
+    }
+  },
+  "settings.resetBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "4d5e873cb668",
+      "ja": "bf3f6f1ddb90"
+    }
+  },
+  "settings.resetConfirm": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "645b60b46aa4",
+      "ja": "8b9d8439e0a9"
+    }
+  },
+  "settings.resetHelp": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "649036ccd0af",
+      "ja": "1549f30f37b6"
+    }
+  },
+  "settings.resetTitle": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "7cc082da9643",
+      "ja": "050b45323e9f"
+    }
+  },
+  "settings.secretWords": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "7cbd7ca7ada6",
+      "ja": "31f05c82ee91"
+    }
+  },
+  "settings.see1": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "140fd81c2e15",
+      "ja": "afe5d2fc62f1"
+    }
+  },
+  "settings.see2": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "20a126cd60d4",
+      "ja": "16b4c0438086"
+    }
+  },
+  "settings.see3": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "404bc2ce04e8",
+      "ja": "ac8c8345cf45"
+    }
+  },
+  "settings.supportBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "4a9b811d91f7",
+      "ja": "650dac021517"
+    }
+  },
+  "settings.wordsSheetTitle": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "3132dafc8dc4",
+      "ja": "7d950379bdd4"
+    }
+  },
+  "settings.wordsSheetWarn": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "5e07dd3ab1a6",
+      "ja": "9cccc2fecc45"
+    }
+  },
+  "shell.intro1": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "f32816965318",
+      "ja": "18261448a1b6"
+    }
+  },
+  "shell.intro2": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "76c975368152",
+      "ja": "8c4b70590c26"
+    }
+  },
+  "shell.intro3": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "7a77e5bdc42a",
+      "ja": "8c3d16b159ef"
+    }
+  },
+  "shell.replacedBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "9d81a98c7749",
+      "ja": "e80336a1839e"
+    }
+  },
+  "shell.replacedRestore": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "38cdb48688f6",
+      "ja": "3b3b7b640490"
+    }
+  },
+  "shell.replacedTitle": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "3a0b228eddad",
+      "ja": "0c3256fd6914"
+    }
+  },
+  "shell.resetFailedBody": {
+    "aiCheck": {
+      "date": "2026-11-13",
+      "ko": "2a299a060fbb",
+      "ja": "720d3318c96b"
+    }
+  },
+  "shell.storageDamagedBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "b55a34a60b83",
+      "ja": "1cf3d8e41ba9"
+    }
+  },
+  "shell.storageDamagedTitle": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "7a81756f1bd7",
+      "ja": "20df3252efa7"
+    }
+  },
+  "shell.storageReset": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "10f0ba5bbc66",
+      "ja": "58fdb265c971"
+    }
+  },
+  "shell.storageUnavailableBody": {
+    "aiCheck": {
+      "date": "2026-11-14",
+      "ko": "388aaa1ba69e",
+      "ja": "7012a3e48bcb"
+    }
+  }
+}

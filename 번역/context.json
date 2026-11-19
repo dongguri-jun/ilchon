@@ -1,0 +1,297 @@
+{
+  "screens": {
+    "shell": {
+      "ko": "앱 틀(배너, 첫 안내, 시작 화면)",
+      "ja": "全体(バナー、最初の案内、起動画面)"
+    },
+    "install": {
+      "ko": "설치 안내",
+      "ja": "インストール案内"
+    },
+    "ui": {
+      "ko": "공통 버튼",
+      "ja": "共通ボタン"
+    },
+    "contacts": {
+      "ko": "일촌 목록",
+      "ja": "イルチョン一覧"
+    },
+    "connect": {
+      "ko": "연결(QR)",
+      "ja": "QRでつながる"
+    },
+    "board": {
+      "ko": "조건 목록, 조건 올리기",
+      "ja": "条件一覧・条件の登録"
+    },
+    "room": {
+      "ko": "거래방",
+      "ja": "取引ルーム"
+    },
+    "lock": {
+      "ko": "잠금, 키 만들기, 12단어",
+      "ja": "ロック・鍵の作成・英単語12個"
+    },
+    "settings": {
+      "ko": "설정",
+      "ja": "設定"
+    },
+    "_outside": {
+      "ko": "사전 밖 문구(오류 화면, 불러오는 화면, 거래방 시스템 줄)",
+      "ja": "辞書外の文言(エラー画面、読み込み画面、取引ルームのシステム表示)"
+    }
+  },
+  "keys": {
+    "board.curKRW": {
+      "where": "조건 올리기의 방향 버튼 문장({currency})과 게시판 줄의 통화 이름",
+      "note": "일본어 이름은 韓国ウォン(용어집)"
+    },
+    "board.curUSD": {
+      "where": "조건 올리기의 방향 버튼 문장({currency})과 게시판 줄의 통화 이름",
+      "note": "일본어 이름은 米ドル(용어집)"
+    },
+    "board.curJPY": {
+      "where": "조건 올리기의 방향 버튼 문장({currency})과 게시판 줄의 통화 이름",
+      "note": "엔화. 일본어 이름은 日本円(용어집, 미확인)"
+    },
+    "board.optKRW": {
+      "where": "조건 올리기의 통화 선택 칸",
+      "max": 6,
+      "note": "통화 기호 ₩를 남긴다. 용어집 이름(韓国ウォン / 米ドル / 日本円)의 예외: 6자 제한 칸이라 기호와 함께 짧은 이름(ウォン / ドル / 円)을 쓴다. 韓国ウォン ₩는 7자라 넘친다. 길이 제한이 없는 문장은 용어집 이름을 쓴다"
+    },
+    "board.optUSD": {
+      "where": "조건 올리기의 통화 선택 칸",
+      "max": 6,
+      "note": "통화 기호 $를 남긴다. 용어집 이름(韓国ウォン / 米ドル / 日本円)의 예외: 6자 제한 칸이라 기호와 함께 짧은 이름(ウォン / ドル / 円)을 쓴다. 韓国ウォン ₩는 7자라 넘친다. 길이 제한이 없는 문장은 용어집 이름을 쓴다"
+    },
+    "board.optJPY": {
+      "where": "조건 올리기의 통화 선택 칸",
+      "max": 6,
+      "note": "엔화. 통화 기호 ¥를 남긴다. 용어집 이름(韓国ウォン / 米ドル / 日本円)의 예외: 6자 제한 칸이라 기호와 함께 짧은 이름(ウォン / ドル / 円)을 쓴다. 韓国ウォン ₩는 7자라 넘친다. 길이 제한이 없는 문장은 용어집 이름을 쓴다"
+    },
+    "board.addKRW0": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(원화)",
+      "max": "button"
+    },
+    "board.addKRW1": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(원화)",
+      "max": "button"
+    },
+    "board.addKRW2": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(원화)",
+      "max": "button"
+    },
+    "board.addKRW3": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(원화)",
+      "max": "button"
+    },
+    "board.addUSD0": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(달러)",
+      "max": "button"
+    },
+    "board.addUSD1": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(달러)",
+      "max": "button"
+    },
+    "board.addUSD2": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(달러)",
+      "max": "button"
+    },
+    "board.addUSD3": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(달러)",
+      "max": "button"
+    },
+    "board.addJPY0": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(엔화)",
+      "max": "button",
+      "note": "일본어는 +1万. +로 시작해야 한다(표에는 앞에 '를 붙여 적는다)"
+    },
+    "board.addJPY1": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(엔화)",
+      "max": "button",
+      "note": "일본어는 +5万"
+    },
+    "board.addJPY2": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(엔화)",
+      "max": "button",
+      "note": "일본어는 +10万"
+    },
+    "board.addJPY3": {
+      "where": "조건 올리기 금액 칸 아래 빠른 더하기 단추(엔화)",
+      "max": "button",
+      "note": "일본어는 +50万"
+    },
+    "room.JPY": {
+      "where": "거래방 문장의 통화 이름({currency})",
+      "note": "엔화. 일본어 이름은 日本円(용어집, 미확인)"
+    },
+    "room.chipAskAccount": {
+      "where": "거래방 입력창 위 칩(구매자)",
+      "max": 8,
+      "note": "일본 은행 표현: 振込先"
+    },
+    "room.chipSendAccount": {
+      "where": "거래방 입력창 위 칩(판매자)",
+      "max": 8,
+      "note": "일본 은행 표현: 振込先"
+    },
+    "room.msgAskAccount": {
+      "where": "칩을 누르면 입력창에 들어가는 문장(구매자가 보냄)",
+      "note": "일본 은행 표현: 振込先"
+    },
+    "room.msgSendAccount": {
+      "where": "칩을 누르면 입력창에 들어가는 머리글. 뒤에 판매자가 계좌를 적는다",
+      "note": "振込先：처럼 전각 콜론으로 끝내고 끝 공백을 두지 않는다"
+    },
+    "room.buyTransfer": {
+      "note": "일본 은행 표현: 振込, 振り込む. 안전 문구"
+    },
+    "room.askAccount": {
+      "note": "일본 은행 표현: 振込先"
+    },
+    "room.sellAccount": {
+      "note": "일본 은행 표현: 口座, 振込先"
+    },
+    "room.writeAccount": {
+      "note": "일본 은행 표현: 口座, 振込先"
+    },
+    "room.sellVerify": {
+      "note": "일본 은행 표현: 入金確認. 안전 문구"
+    },
+    "room.verifyName": {
+      "note": "일본 은행 표현: 振込名義. 일본 입금 내역의 이름은 가타카나로 찍히는 경우가 많다(추론, 지인에게 물을 것). 안전 문구"
+    },
+    "room.doneNotice1": {
+      "note": "일본 은행 표현: 銀行振込. 안전 문구. 통화 이름은 용어집대로 韓国ウォン・米ドル・日本円"
+    },
+    "room.doneNotice2": {
+      "note": "일본 은행 표현: 振込名義, 口座名義. 안전 문구"
+    },
+    "settings.limit2": {
+      "note": "일본 은행 표현: 銀行振込. 프라이버시 약속(안전 문구)"
+    },
+    "room.invNotPayer": {
+      "where": "거래방 청구서 카드. 구매자 화면에 청구서가 붙었을 때",
+      "max": 90,
+      "note": "구매자가 결제하면 돈을 잃는다. 경고가 약해지면 안 된다"
+    },
+    "settings.supportBody": {
+      "where": "설정의 문의 구역 설명. 기록 복사 단추 위",
+      "note": "안전 키(프라이버시 약속). 일본어를 넣으면 같은 변경에서 교차검사"
+    },
+    "settings.supportVersion": {
+      "where": "설정의 문의 구역 안, 기록 복사 단추 아래 작은 글씨의 앱 버전(위험 구역 위)",
+      "note": "{v}는 빌드 날짜와 커밋 7자리(예: 2026-11-12 08c3f7c)"
+    }
+  },
+  "outside": [
+    {
+      "key": "_outside.crash.title",
+      "files": {
+        "ko": "src/screens/shell/crash-copy.ts",
+        "en": "src/screens/shell/crash-copy.ts",
+        "ja": "src/screens/shell/crash-copy.ts"
+      },
+      "ko": "문제가 생겼어요",
+      "en": "Something went wrong",
+      "ja": "問題が発生しました",
+      "where": "앱이 화면을 그리지 못했을 때(오류 화면 제목)"
+    },
+    {
+      "key": "_outside.crash.body",
+      "files": {
+        "ko": "src/screens/shell/crash-copy.ts",
+        "en": "src/screens/shell/crash-copy.ts",
+        "ja": "src/screens/shell/crash-copy.ts"
+      },
+      "ko": "화면을 표시하지 못했어요. 새로고침해 주세요.",
+      "en": "This screen couldn’t be shown. Please reload.",
+      "ja": "画面を表示できませんでした。再読み込みしてください。",
+      "where": "앱이 화면을 그리지 못했을 때(오류 화면 설명)"
+    },
+    {
+      "key": "_outside.crash.reload",
+      "files": {
+        "ko": "src/screens/shell/crash-copy.ts",
+        "en": "src/screens/shell/crash-copy.ts",
+        "ja": "src/screens/shell/crash-copy.ts"
+      },
+      "ko": "새로고침",
+      "en": "Reload",
+      "ja": "再読み込み",
+      "where": "오류 화면의 단추",
+      "max": "button"
+    },
+    {
+      "key": "_outside.copylog.copy",
+      "files": {
+        "ko": "src/lib/support-log/copy-log-copy.ts",
+        "en": "src/lib/support-log/copy-log-copy.ts",
+        "ja": "src/lib/support-log/copy-log-copy.ts"
+      },
+      "ko": "기록 복사",
+      "en": "Copy log",
+      "where": "문의용 기록을 복사하는 단추(설정의 문의, 시작·오류·잠금 화면)",
+      "max": "button",
+      "ja": "ログをコピー"
+    },
+    {
+      "key": "_outside.copylog.copied",
+      "files": {
+        "ko": "src/lib/support-log/copy-log-copy.ts",
+        "en": "src/lib/support-log/copy-log-copy.ts",
+        "ja": "src/lib/support-log/copy-log-copy.ts"
+      },
+      "ko": "복사했어요",
+      "en": "Copied",
+      "where": "기록 복사 단추를 누른 뒤 2초 동안 단추에 보이는 글",
+      "max": "button",
+      "ja": "コピーしました"
+    },
+    {
+      "key": "_outside.copylog.failed",
+      "files": {
+        "ko": "src/lib/support-log/copy-log-copy.ts",
+        "en": "src/lib/support-log/copy-log-copy.ts",
+        "ja": "src/lib/support-log/copy-log-copy.ts"
+      },
+      "ko": "복사하지 못했어요",
+      "en": "Couldn't copy",
+      "where": "기록 복사에 실패했을 때 2초 동안 단추에 보이는 글",
+      "max": "button",
+      "ja": "コピーできませんでした"
+    },
+    {
+      "key": "_outside.splash.loading",
+      "files": {
+        "ko": [
+          "index.html",
+          "public/boot-splash.js"
+        ],
+        "en": "public/boot-splash.js",
+        "ja": "public/boot-splash.js"
+      },
+      "ko": "불러오고 있어요",
+      "en": "Loading",
+      "ja": "読み込んでいます",
+      "where": "앱을 불러오는 화면",
+      "note": "한국어는 index.html과 boot-splash.js의 표에 같은 글이 있어야 한다"
+    },
+    {
+      "key": "_outside.splash.slow",
+      "files": {
+        "ko": [
+          "index.html",
+          "public/boot-splash.js"
+        ],
+        "en": "public/boot-splash.js",
+        "ja": "public/boot-splash.js"
+      },
+      "ko": "시간이 오래 걸리고 있어요. 눌러서 새로고침해 주세요.",
+      "en": "This is taking a while. Tap to reload.",
+      "ja": "時間がかかっています。タップして再読み込みしてください。",
+      "where": "불러오는 화면에서 12초가 지났을 때 나오는 단추",
+      "note": "한국어는 index.html과 boot-splash.js의 표에 같은 글이 있어야 한다"
+    }
+  ]
+}

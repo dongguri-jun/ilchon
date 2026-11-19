@@ -1,0 +1,438 @@
+.room {
+  display: flex;
+  flex-direction: column;
+  /* Fills the shell overlay, which already sits below the demo banner. */
+  height: 100%;
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  background: var(--c-bg);
+  overflow: hidden;
+}
+
+/* ---- summary ---- */
+
+.room__summary {
+  flex: none;
+  padding: var(--sp-8) var(--sp-16) 0;
+}
+
+.room__summary-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.room__caret {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin: 0 var(--sp-4) 3px;
+  border-right: var(--bw-2) solid var(--c-text-dim);
+  border-bottom: var(--bw-2) solid var(--c-text-dim);
+  transform: rotate(45deg);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.room__caret--open {
+  margin-bottom: -3px;
+  transform: rotate(-135deg);
+}
+
+.room__sats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding-top: var(--sp-6);
+  border-top: var(--bw-1) dashed var(--c-border);
+}
+
+.room__sats-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-8);
+  font-size: var(--fs-14);
+}
+
+.room__sats-note {
+  margin: 0;
+}
+
+/* ---- messages ---- */
+
+.room__messages {
+  /* Containing block for the cards' absolutely placed screen-reader text: without it the
+     text escapes this scroller and makes the whole room overlay scroll into blank space. */
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding: var(--sp-12) var(--sp-16);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.room__system {
+  align-self: center;
+  max-width: 88%;
+  margin: var(--sp-4) 0;
+  text-align: center;
+}
+
+.room__system-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-6);
+}
+
+.room__system-action .ui-btn {
+  min-height: 44px;
+}
+
+.room__msg {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-6);
+  max-width: 100%;
+}
+
+.room__msg--mine {
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+}
+
+.room__msg--sending .room__bubble {
+  opacity: 0.6;
+}
+
+/* Status line under my own bubble: sending / failed (tap to retry). */
+.room__status {
+  flex-basis: 100%;
+  text-align: right;
+  font-size: var(--fs-12);
+}
+
+.room__status--sending {
+  color: var(--c-text-faint);
+}
+
+.room__status--failed {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: var(--sp-4) 0;
+  margin: 0;
+  font: inherit;
+  font-size: var(--fs-12);
+  color: var(--c-danger-text);
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.room__status--failed:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.room__bubble {
+  min-width: 0;
+  max-width: 80%;
+  padding: var(--sp-8) var(--sp-12);
+  border-radius: var(--radius-dialog);
+  font-size: var(--fs-16);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.room__msg--mine .room__bubble {
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+  border-bottom-right-radius: var(--radius-xs);
+}
+
+.room__msg--theirs .room__bubble {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+  border-bottom-left-radius: var(--radius-xs);
+}
+
+.room__time {
+  flex: none;
+  font-size: var(--fs-11);
+  color: var(--c-text-faint);
+}
+
+.room__ln {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-6);
+  max-width: 100%;
+  margin: 2px 0;
+  padding: 2px 2px 2px var(--sp-8);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  vertical-align: middle;
+}
+
+.room__ln-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--fs-12);
+}
+
+.room__ln-copy {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 32px;
+  padding: 0 var(--sp-8);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: var(--fs-12);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.room__ln-copy:active {
+  opacity: 0.7;
+}
+
+/* ---- composer ---- */
+
+.room__reopen { margin: 0; color: var(--c-text-dim); font-size: var(--fs-12); line-height: 1.5; }
+
+.room__composer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding: var(--sp-8) var(--sp-16) calc(var(--sp-8) + var(--safe-b, 0px));
+  border-top: var(--bw-1) solid var(--c-border);
+  background: var(--c-bg);
+  /* Above Android Chrome's keyboard bar (keyboard-gap.ts sets it while the keyboard is up). */
+  margin-bottom: var(--room-kb, 0px);
+}
+
+.room__shortcuts {
+  display: flex;
+  /* The seller's two chips can be wider than 320px in Japanese: wrap, never clip. */
+  flex-wrap: wrap;
+  gap: var(--sp-8);
+}
+
+.room__input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-8);
+}
+
+.room__input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- done sheet ---- */
+
+.room__notice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding: var(--sp-12);
+  border-radius: var(--radius-md);
+  background: var(--c-warning-soft);
+  font-size: var(--fs-14);
+  line-height: 1.5;
+}
+
+.room__notice p {
+  margin: 0;
+}
+
+/* Keep guidance compact at 360px; the steps scroll independently of chat. */
+.room__summary { max-height: 40%; min-height: 0; display: flex; }
+.room__summary > .ui-card { width: 100%; min-height: 0; display: flex; flex-direction: column; }
+.room__summary-head { flex: none; }
+.room__guide-heading { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+.room__guide-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; border-top: var(--bw-1) solid var(--c-border); margin-top: var(--sp-6); padding-top: var(--sp-8); }
+.room__step { display: flex; gap: var(--sp-8); font-size: var(--fs-14); line-height: 1.45; }
+.room__step > div { flex: 1; min-width: 0; }
+.room__step .ui-btn { display: flex; margin-top: var(--sp-6); min-height: 44px; }
+.room__guide-current { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.room__stepper { list-style: none; display: flex; margin: 0 0 var(--sp-6); padding: 0; }
+.room__stepper-item { position: relative; flex: 1; display: flex; justify-content: center; }
+.room__stepper-item + .room__stepper-item::before { content: ''; position: absolute; top: 50%; left: calc(-50% + 15px); right: calc(50% + 15px); height: var(--bw-1); background: var(--c-border); }
+.room__stepper-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--c-text-dim); cursor: pointer; }
+.room__stepper-dot { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: var(--radius-pill); background: var(--c-surface-2); font-size: var(--fs-12); }
+.room__stepper-dot--past { background: none; box-shadow: inset 0 0 0 var(--bw-1) var(--c-border); }
+.room__stepper-dot--checked { background: var(--c-success-soft); box-shadow: none; color: var(--c-success); }
+.room__stepper-dot--current { background: var(--c-primary); color: var(--c-on-primary); font-weight: 700; }
+/* Prev/next stay pinned to the bottom of the scrolling guide body, so an extra line above
+   (the invoice-expired note) never pushes them out of sight. */
+.room__step-nav { position: sticky; bottom: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-8); margin-top: 0; padding: var(--sp-8) 0 var(--sp-4); background: var(--c-surface); }
+/* Focus scrolling must clear the pinned nav; on a short viewport (keyboard open) it stops pinning. */
+.room__guide-body { scroll-padding-bottom: 72px; }
+@media (max-height: 560px) { .room__step-nav { position: static; } }
+.room__step-nav .ui-btn { min-height: 44px; }
+.room__step-number { display: inline-flex; flex: none; width: 22px; height: 22px; align-items: center; justify-content: center; border-radius: var(--radius-pill); background: var(--c-surface-2); font-size: var(--fs-12); }
+.room__step-number--checked { background: var(--c-success-soft); color: var(--c-success); }
+.room__terms { margin-top: var(--sp-6); padding: var(--sp-8); border-radius: var(--radius-sm); background: var(--c-surface-2); }
+.room__guide-note { margin: var(--sp-4) 0 var(--sp-8); color: var(--c-text-dim); font-size: var(--fs-12); line-height: 1.5; }
+.room__done-label { display: flex; flex-direction: column; line-height: 1.3; }
+.room__done-label small { font-size: var(--fs-11); font-weight: 400; }
+/* Line heights written as numbers do not follow the Japanese --lh-body; multi-line Japanese
+   needs more room (starting values). */
+:root:lang(ja) .room__step,
+:root:lang(ja) .room__guide-note { line-height: 1.6; }
+:root:lang(ja) .room__done-label { line-height: 1.4; }
+.room .ui-appbar { flex: none; }
+.room .ui-appbar__side--right .ui-btn { min-height: 44px; }
+.room__ln-copy, .room__status--failed { min-height: 44px; }
+.room__composer .ui-field__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+/* Who I am in this trade, always visible above the guide and chat. */
+.room__role { flex: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-4) var(--sp-12); margin: var(--sp-8) var(--sp-16) 0; padding: 10px var(--sp-16); border-radius: var(--radius-md); border: var(--bw-1) solid var(--c-border); background: var(--c-surface-2); }
+.room__role-me { font-size: var(--fs-18); font-weight: 700; }
+.room__role-peer { font-size: var(--fs-14); color: var(--c-text-dim); }
+.room__role--sell { border-color: var(--c-brand); }
+.room__role--sell .room__role-me { color: var(--c-brand); }
+.room__role--buy .room__role-me { color: var(--c-text); }
+.room__shortcuts { flex-wrap: wrap; }
+
+/* ---- where the buyer receives ---- */
+
+.room__step-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-8);
+  margin-top: var(--sp-8);
+}
+
+.recv__note {
+  margin: 0;
+  color: var(--c-text-dim);
+  font-size: var(--fs-14);
+}
+
+.recv__choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+/* Each choice wraps at 320px: the amount line may take two lines, never a side scroll. */
+.recv__choice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-4);
+  min-width: 0;
+  padding: var(--sp-12);
+  border: var(--bw-1) solid var(--c-border);
+  border-radius: var(--radius-md);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+button.recv__choice {
+  cursor: pointer;
+}
+
+.recv__choice.is-selected {
+  border-color: var(--c-border-strong);
+  background: var(--c-primary-soft);
+}
+
+.recv__choice--custom {
+  align-items: stretch;
+}
+
+.recv__choice-title {
+  font-weight: var(--fw-bold);
+}
+
+.recv__choice-sats {
+  color: var(--c-text-dim);
+}
+
+.recv__paste {
+  flex: none;
+  min-height: 32px;
+  padding: 0 var(--sp-8);
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+}
+
+.recv__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  margin: 0;
+  color: var(--c-danger-text);
+  font-size: var(--fs-14);
+}
+
+.recv__error svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* The active receiving place above the drawn messages while it is older than them:
+   the card itself, under one line that names it and opens the history. */
+.room__pinned {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  min-width: 0;
+  padding: var(--sp-8);
+  border: var(--bw-1) solid var(--c-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--c-bg);
+}
+
+.room__pinned-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4) var(--sp-8);
+  min-width: 0;
+}
+
+.room__pinned-head .ui-btn {
+  min-height: 44px;
+}
+
+.room__messages [data-msg]:focus:not(:focus-visible) {
+  outline: none;
+}

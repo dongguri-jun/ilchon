@@ -1,0 +1,198 @@
+.settings__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-24);
+  padding-top: var(--sp-8);
+  padding-bottom: var(--sp-32);
+}
+.settings__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+.settings__heading {
+  padding: 0 var(--sp-4);
+  color: var(--c-text-dim);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-body);
+}
+.settings__lang-label {
+  display: block;
+  padding: var(--sp-16) var(--sp-16) var(--sp-4);
+}
+.settings__lang-row {
+  min-height: 52px;
+  border-radius: 0;
+}
+.settings__lang-row:last-child {
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+}
+.settings__lang-check {
+  color: var(--c-text);
+}
+.settings__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-12);
+}
+/* The text beside it truncates (npub); the button keeps its label (コピー was clipped at 320px). */
+.settings__toggle > .ui-btn {
+  flex: none;
+}
+.settings__action {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+.settings__divider {
+  height: 1px;
+  margin: var(--sp-16) 0;
+  background: var(--c-border);
+}
+/* Auto-lock: the label, four choices, the help line. */
+.settings__relock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+/* Four options at 320 px: "30 min" must not be cut. */
+.settings__relock .ui-seg__item {
+  padding: 0 var(--sp-8);
+}
+.settings__relays {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-12);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.settings__relay {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-12);
+}
+/* A relay host and the shortened npub wrap rather than lose their tail: at 320 px
+   (English badge "Connected") a long host was cut to "relay.us.whitenoise.ch…" and the
+   npub to "npub1…uq…", hiding the part that tells one from another. */
+.settings__relay-url {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.settings__npub {
+  font-size: var(--fs-14);
+  overflow-wrap: anywhere;
+}
+.settings__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  margin: var(--sp-8) 0 0;
+  padding-left: var(--sp-20);
+  list-style: disc;
+}
+.settings__warn {
+  margin: 0;
+  padding: var(--sp-8) var(--sp-12);
+  border-radius: var(--radius-sm);
+  background: var(--c-danger-soft);
+  color: var(--c-danger-text);
+}
+.settings__relay-side {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex: none;
+}
+.settings__relay-note {
+  margin: var(--sp-8) 0 0;
+}
+/* The field keeps room for its placeholder (wss://relay.example.com); on a narrow
+   phone (320 px) the button goes below it instead of cutting the placeholder. */
+.settings__relay-add {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-8);
+}
+.settings__relay-add > :first-child {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+.settings__relay-apply {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-8);
+}
+.settings__relay-check {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  text-align: left;
+}
+.settings__relay-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sp-4) var(--sp-12);
+  margin: 0;
+}
+.settings__relay-facts dt {
+  color: var(--c-text-dim);
+}
+.settings__relay-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.settings__relay-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.settings__relay-warnings li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  padding: var(--sp-6) var(--sp-8);
+  border-radius: var(--radius-sm);
+  background: var(--c-warning-soft);
+  font-size: var(--fs-14);
+}
+.settings__relay-warnings svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--c-warning);
+}
+.settings__relay-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  margin: var(--sp-8) 0 0;
+  padding: var(--sp-6) var(--sp-8);
+  border-radius: var(--radius-sm);
+  background: var(--c-warning-soft);
+}
+.settings__relay-alert svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--c-warning);
+}
+
+/* Lightning address: a long name@domain wraps instead of
+   pushing the row wider than 320px; the domain to confirm is shown large. */
+.settings__ln-value {
+  overflow-wrap: anywhere;
+}
+
+.settings__ln-domain {
+  margin: 0 0 var(--sp-12);
+  font-size: var(--fs-21);
+  font-weight: var(--fw-bold);
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,38 @@
+/* Coconut badge: radius 10, tinted 13-18% fill, colored bold text */
+.ui-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-4);
+  height: 22px;
+  padding: 0 var(--sp-8);
+  border-radius: var(--radius-badge);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  white-space: nowrap;
+}
+.ui-badge--neutral {
+  background: var(--c-surface-2);
+  color: var(--c-text-dim);
+}
+.ui-badge--primary {
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+}
+.ui-badge--success {
+  background: var(--c-success-soft);
+  color: var(--c-success);
+}
+.ui-badge--warning {
+  background: var(--c-warning-soft);
+  color: var(--c-warning);
+}
+.ui-badge--danger {
+  background: var(--c-danger-soft);
+  color: var(--c-danger-text);
+}
+.ui-badge--info {
+  background: var(--c-info-soft);
+  color: var(--c-info);
+}

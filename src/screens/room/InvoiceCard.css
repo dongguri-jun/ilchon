@@ -1,0 +1,190 @@
+/* Lightning invoice shown in a chat bubble: amount, expiry, warnings, actions. */
+
+.inv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  min-width: 220px;
+  margin: var(--sp-2) 0;
+  padding: var(--sp-12);
+  border-radius: var(--radius-md);
+  background: var(--c-surface);
+  color: var(--c-text);
+  border: var(--bw-1) solid var(--c-border);
+}
+
+.inv--warn {
+  border-color: var(--c-warning);
+}
+
+.inv--blocked {
+  border-color: var(--c-danger);
+}
+
+.inv__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-8);
+}
+
+.inv__label {
+  color: var(--c-text-dim);
+}
+
+.inv__expiry {
+  color: var(--c-text-dim);
+}
+
+.inv--blocked .inv__expiry {
+  color: var(--c-danger-text);
+  font-weight: 600;
+}
+
+.inv__amount {
+  font-size: var(--fs-21);
+  font-weight: 700;
+  line-height: var(--lh-tight);
+}
+
+.inv__unit {
+  font-size: var(--fs-14);
+  font-weight: 500;
+  color: var(--c-text-dim);
+}
+
+.inv__desc {
+  margin: 0;
+  color: var(--c-text-dim);
+  overflow-wrap: anywhere;
+}
+
+.inv__issues {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.inv__issue {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  padding: var(--sp-6) var(--sp-8);
+  border-radius: var(--radius-sm);
+  background: var(--c-warning-soft);
+  font-size: var(--fs-14);
+  line-height: 1.4;
+}
+
+.inv__issue svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--c-warning);
+}
+
+.inv__issue--blocking {
+  background: var(--c-danger-soft);
+  color: var(--c-danger-text);
+}
+
+.inv__issue--blocking svg {
+  color: var(--c-danger);
+}
+
+.inv__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-6);
+  margin-top: var(--sp-2);
+}
+
+.inv__pay {
+  text-decoration: none;
+}
+
+.inv__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 44px;
+  padding: 0 var(--sp-12);
+  border: var(--bw-1) solid var(--c-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--c-text);
+  font: inherit;
+  font-size: var(--fs-14);
+  cursor: pointer;
+}
+
+.inv__action:active {
+  opacity: 0.7;
+}
+
+.inv__hint {
+  margin: 0;
+  color: var(--c-text-dim);
+  font-size: var(--fs-14);
+  line-height: 1.4;
+}
+
+.inv__qr {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--sp-4);
+}
+
+.inv__memo-label {
+  font-weight: 600;
+}
+
+.inv__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  margin: 0;
+  padding: var(--sp-6) var(--sp-8);
+  border-radius: var(--radius-sm);
+  background: var(--c-info-soft);
+  font-size: var(--fs-14);
+  line-height: 1.4;
+}
+
+.inv__note--warn {
+  background: var(--c-warning-soft);
+}
+
+.inv__note svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--c-warning);
+}
+
+/* Not the card of the current trade: sats and one line, no actions. */
+.inv--inactive {
+  opacity: 0.6;
+  color: var(--c-text-dim);
+}
+
+.inv--inactive .inv__amount {
+  color: var(--c-text-dim);
+}
+
+.inv__fiat {
+  margin: 0;
+  color: var(--c-text-dim);
+}
+
+/* On-chain card: the address, shortened in the middle on screen
+   (copy and the QR carry all of it); it may still break anywhere at 320px. */
+.inv__address {
+  margin: 0;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--fs-12);
+  color: var(--c-text-dim);
+  overflow-wrap: anywhere;
+}

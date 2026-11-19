@@ -1,0 +1,43 @@
+/* The first paint, before the app's own styles load. React replaces it on mount. */
+.boot-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 32px 24px;
+  box-sizing: border-box;
+  color: #4a4a4a; /* = --c-text-dim, 4.5:1 or more on white */
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  text-align: center;
+}
+/* Japanese glyph shapes come from a Japanese font, not a Korean one (boot-splash.js sets lang first). */
+:root:lang(ja) .boot-splash {
+  font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic UI', Meiryo,
+    sans-serif;
+}
+.boot-splash img {
+  display: block;
+  width: auto;
+  height: 36px;
+  max-width: 100%;
+}
+.boot-splash p {
+  margin: 0;
+}
+.boot-splash button {
+  min-height: 44px;
+  padding: 8px;
+  border: 0;
+  background: none;
+  color: #141318;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.boot-splash button[hidden] {
+  display: none;
+}

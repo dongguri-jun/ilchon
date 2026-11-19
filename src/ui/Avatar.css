@@ -1,0 +1,10 @@
+.ui-avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  user-select: none;
+}
