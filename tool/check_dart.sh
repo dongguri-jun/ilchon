@@ -16,6 +16,8 @@ if ! "$DART" --version >/dev/null 2>&1; then
   exit 127
 fi
 chrome="${CHROME_EXECUTABLE:-}"
+mac_chrome="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+if [ -z "$chrome" ] && [ -x "$mac_chrome" ]; then chrome="$mac_chrome"; fi
 if [ -z "$chrome" ]; then chrome="$(command -v google-chrome chromium chromium-browser chrome 2>/dev/null | head -n1)"; fi
 if [ -z "$chrome" ] || ! [ -x "$chrome" ]; then
   echo "check:dart: no Chrome for the browser tests (dart2js, dart2wasm). Install Chrome or Chromium, or set CHROME_EXECUTABLE to a Chrome binary." >&2
