@@ -144,6 +144,33 @@ void main() {
     });
   });
 
+  group('folders named like tool output', () {
+    test('build/ or a hidden folder inside lib/ is read like any other folder', () async {
+      expect(
+        await rulesAfter({
+          '$domain/payments/build/clock.dart': "import 'dart:io';",
+          '$domain/payments/.hidden/app.dart': "import '../../../application/ports.dart';",
+          '$application/ports.dart': '',
+        }),
+        {'forbidden-lib', 'layer'},
+      );
+    });
+
+    test('the same folders are searched for forbidden identifiers', () async {
+      final found = await violationsAfter({
+        '$domain/payments/build/clock.dart': 'final a = DateTime.now();',
+      }, resolve: true);
+      expect({for (final v in found) '${p.basename(v.path)} ${v.rule}'}, {'clock.dart identifier'});
+    });
+
+    test('only the tool output folders of a member are skipped', () async {
+      expect(
+        await rulesAfter({'$core/build/x.dart': "import 'dart:io';", '$core/.dart_tool/x.dart': "import 'dart:io';"}),
+        isEmpty,
+      );
+    });
+  });
+
   group('parts', () {
     test('part and part of are refused', () async {
       expect(await rulesAfter({'$domain/payments/x.dart': "part 'y.dart';"}), {'part'});
@@ -238,7 +265,7 @@ void main() {
       });
       expect(
         await rulesAfter({
-          'packages/ilchon_core/pubspec.yaml': core.replaceFirst('sdk: ^3.9.0', 'sdk: ^3.9.0\n  flutter: ">=3.0.0"'),
+          'packages/ilchon_core/pubspec.yaml': core.replaceFirst('sdk: ^3.14.0', 'sdk: ^3.14.0\n  flutter: ">=3.0.0"'),
         }),
         {'dependency'},
       );
@@ -250,7 +277,7 @@ void main() {
       );
       expect(
         await rulesAfter({
-          'packages/ilchon_new/pubspec.yaml': 'name: ilchon_new\nresolution: workspace\nenvironment:\n  sdk: ^3.9.0\n',
+          'packages/ilchon_new/pubspec.yaml': 'name: ilchon_new\nresolution: workspace\nenvironment:\n  sdk: ^3.14.0\n',
         }),
         {'dependency'},
       );

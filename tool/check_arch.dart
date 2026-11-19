@@ -123,16 +123,28 @@ class _Workspace {
 
 YamlMap _readYaml(String file) => loadYaml(File(file).readAsStringSync()) as YamlMap;
 
-/// Dart files that belong to [member], without build output, hidden folders and the must-not-compile fixtures.
+/// Folders directly under a member that hold tool output, not source. Nowhere else is a folder skipped:
+/// a `build/` or `.hidden/` folder inside `lib/` is scanned like any other.
+const _outputFolders = {'build', '.dart_tool'};
+
+/// The folder of [member] that is scanned: `tool/` for the root, the whole folder for every other member.
+String _scannedFolder(_Member member) => member.isRoot ? p.join(member.dir, 'tool') : member.dir;
+
+/// Dart files that belong to [member], without its tool output and the must-not-compile fixtures.
 List<String> _dartFiles(_Member member) {
-  final base = member.isRoot ? p.join(member.dir, 'tool') : member.dir;
+  final base = _scannedFolder(member);
   if (!Directory(base).existsSync()) return const [];
   return [
     for (final f in Directory(base).listSync(recursive: true))
       if (f is File && f.path.endsWith('.dart'))
-        if (!p.split(p.relative(f.path, from: base)).any((s) => s.startsWith('.') || s == 'build' || s == 'no_compile'))
-          f.path,
+        if (!_isOutput(member, base, f.path)) f.path,
   ]..sort();
+}
+
+bool _isOutput(_Member member, String base, String file) {
+  final parts = p.split(p.relative(file, from: base));
+  if (_outputFolders.contains(parts.first)) return true;
+  return !member.isRoot && p.isWithin(p.join(base, 'test', 'no_compile'), file);
 }
 
 // ---------------------------------------------------------------------------------------------
