@@ -23,6 +23,8 @@
     "check:trade": "tsx scripts/check-trade.ts",
     "check:lnurl": "tsx scripts/check-lnurl.ts",
     "check:onchain": "tsx scripts/check-onchain.ts",
+    "check:vectors": "tsx scripts/export-vectors.ts --check",
+    "vectors": "tsx scripts/export-vectors.ts",
     "check:nostr-profile": "tsx --test src/lib/nostr-profile/index.test.ts",
     "check:history": "tsx --test src/screens/shell/overlay-history.test.ts",
     "check:support-log": "tsx scripts/check-support-log.ts",

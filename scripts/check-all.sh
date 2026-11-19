@@ -24,6 +24,7 @@ STEPS=(
   check:trade
   check:lnurl
   check:onchain
+  check:vectors
   check:support-log
   check:csp
   check:a11y
